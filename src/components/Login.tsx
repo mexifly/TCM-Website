@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Login.css";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -41,7 +42,10 @@ const Login: React.FC = () => {
               required
             />
           </div>
-          <button type="submit">Login</button>
+
+          <Link to="/main">
+            <button type="submit">Login</button>
+          </Link>
         </form>
       </div>
     </div>
