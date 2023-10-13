@@ -1,9 +1,146 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import classes from "../ContentPage.module.css";
 
 function ResultRecordsPage() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [inputPage, setInputPage] = useState("");
+
+  const itemsPerPage = 6;
+  const lastIndex = currentPage * itemsPerPage;
+  const firstIndex = lastIndex - itemsPerPage;
+  const totalPages = 3; // Assume you have 30 records
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => prev + 1);
+  };
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => prev - 1);
+  };
+
+  const handlePageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputPage(e.target.value);
+  };
+
+  const handlePageSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      const newPage = parseInt(inputPage);
+      if (!isNaN(newPage) && newPage >= 1) {
+        setCurrentPage(newPage);
+      }
+    }
+  };
+
+  const visiblePages = () => {
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  const tableData = [...Array(30)].map((_, index) => (
+    <tr key={index}>
+      <td>Data 1-{index + 1}</td>
+      <td>Data 2-{index + 1}</td>
+      <td>Data 3-{index + 1}</td>
+      <td>
+        <div style={{ display: "flex", flexDirection: "row" }}>
+          <button
+            style={{
+              width: "100px",
+              height: "60px",
+              fontSize: "20px",
+              marginRight: "20px",
+            }}
+          >
+            Delete
+          </button>
+          <button style={{ width: "100px", height: "60px", fontSize: "20px" }}>
+            Details
+          </button>
+        </div>
+      </td>
+    </tr>
+  ));
+
+  const inputStyle: React.CSSProperties = {
+    width: "40px",
+    textAlign: "center",
+    padding: "5px",
+    margin: "0 10px",
+  };
+
+  const tableContainerStyle: React.CSSProperties = {
+    width: "95%",
+    height: "calc(100vh - 250px)",
+    overflowY: "auto" as "auto",
+    marginLeft: "auto",
+    marginRight: "auto",
+    paddingBottom: "20px",
+  };
+
+  const tableStyle: React.CSSProperties = {
+    width: "100%",
+    borderCollapse: "collapse",
+  };
+
+  const thStyle: React.CSSProperties = {
+    borderBottom: "2px solid #ddd",
+    padding: "16px",
+    textAlign: "left",
+    fontSize: "2em",
+  };
+
+  const buttonStyle = {
+    margin: "10px 3px",
+    backgroundColor: "#4CAF50",
+    color: "white",
+    padding: "8px 16px",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    fontSize: "1em",
+  };
+
+  const downloadButtonStyle: React.CSSProperties = {
+    padding: "8px 16px",
+    backgroundColor: "#4CAF50",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    fontSize: "1em",
+    marginBottom: "20px",
+    marginLeft: "1300px",
+  };
+
+  const paginationButtonStyle = {
+    margin: "5px",
+    padding: "8px 6px",
+    backgroundColor: "#4CAF50",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    fontSize: "1em",
+  };
+
+  const topContainerStyle: React.CSSProperties = {
+    display: "flex",
+    justifyContent: "flex-end",
+    marginBottom: "20px",
+  };
+
+  const paginationButtonContainerStyle: React.CSSProperties = {
+    display: "flex",
+    justifyContent: "space-between",
+    width: "200px",
+    marginTop: "10px",
+  };
+
   return (
     <div className={classes.testmanagementpage}>
       <Header />
@@ -11,25 +148,55 @@ function ResultRecordsPage() {
         <div className={classes.sidebarandmaincontent}>
           <Sidebar />
           <div className={classes.maincontent}>
+            <div style={topContainerStyle}>
+              <button style={downloadButtonStyle}>Download</button>
+            </div>
             <div style={tableContainerStyle}>
               <table style={tableStyle}>
                 <thead>
                   <tr>
-                    <th style={thStyle}>Header 1</th>
-                    <th style={thStyle}>Header 2</th>
-                    <th style={thStyle}>Header 3</th>
+                    <th style={thStyle}>Reference Number</th>
+                    <th style={thStyle}>Grades</th>
+                    <th style={thStyle}>Test Date</th>
+                    <th style={thStyle}>Action</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {[...Array(30)].map((_, index) => (
-                    <tr key={index}>
-                      <td style={tdStyle}>Data 1-{index + 1}</td>
-                      <td style={tdStyle}>Data 2-{index + 1}</td>
-                      <td style={tdStyle}>Data 3-{index + 1}</td>
-                    </tr>
-                  ))}
-                </tbody>
+                <tbody>{tableData.slice(firstIndex, lastIndex)}</tbody>
               </table>
+            </div>
+            <div style={paginationButtonContainerStyle}>
+              <button
+                style={paginationButtonStyle}
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+
+              {visiblePages().map((page) => (
+                <button
+                  key={page}
+                  style={paginationButtonStyle}
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </button>
+              ))}
+
+              <input
+                type="text"
+                style={inputStyle}
+                value={inputPage}
+                onChange={handlePageInput}
+                onKeyDown={handlePageSubmit}
+              />
+              <button
+                style={paginationButtonStyle}
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>
@@ -37,32 +204,5 @@ function ResultRecordsPage() {
     </div>
   );
 }
-
-// Inline styles
-const tableContainerStyle: React.CSSProperties = {
-  width: "80%",
-  height: "calc(100vh - 52px)", // Replace [HEIGHT_OF_HEADER] with the actual height of your header
-  overflowY: "auto",
-  marginLeft: "auto",
-  marginRight: "auto",
-};
-
-const tableStyle: React.CSSProperties = {
-  width: "100%",
-  borderCollapse: "collapse" as "collapse",
-};
-
-const thStyle: React.CSSProperties = {
-  borderBottom: "2px solid #ddd",
-  padding: "16px",
-  textAlign: "left",
-  fontSize: "2em",
-};
-
-const tdStyle: React.CSSProperties = {
-  borderBottom: "1px solid #ddd",
-  padding: "16px",
-  fontSize: "2em",
-};
 
 export default ResultRecordsPage;
