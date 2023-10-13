@@ -14,7 +14,7 @@ const Login: React.FC = () => {
   return (
     <div className="login-page">
       <div className="login-box">
-        <h1 className="headline">Administer System</h1>
+        <h1 className="headline">Administrator System</h1>
         <form onSubmit={handleLogin}>
           <div className="input-group">
             <label htmlFor="email">
