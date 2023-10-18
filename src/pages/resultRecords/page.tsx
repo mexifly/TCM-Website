@@ -7,7 +7,7 @@ function ResultRecordsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [inputPage, setInputPage] = useState("");
 
-  const itemsPerPage = 6;
+  const itemsPerPage = 10;
   const lastIndex = currentPage * itemsPerPage;
   const firstIndex = lastIndex - itemsPerPage;
   const totalPages = 3; // Assume you have 30 records
@@ -41,24 +41,45 @@ function ResultRecordsPage() {
     return pages;
   };
 
+  const tdStyle: React.CSSProperties = {
+    borderBottom: "1px solid #ddd",
+    borderRight: "1px solid #ddd",
+    width: "400px",
+    textAlign: "center",
+    verticalAlign: "middle",
+  };
+
   const tableData = [...Array(30)].map((_, index) => (
     <tr key={index}>
-      <td>Data 1-{index + 1}</td>
-      <td>Data 2-{index + 1}</td>
-      <td>Data 3-{index + 1}</td>
-      <td>
+      <td style={tdStyle}>Data 1-{index + 1}</td>
+      <td style={tdStyle}>Data 2-{index + 1}</td>
+      <td style={tdStyle}>Data 3-{index + 1}</td>
+      <td style={tdStyle}>
         <div style={{ display: "flex", flexDirection: "row" }}>
           <button
             style={{
               width: "100px",
-              height: "60px",
+              height: "40px",
               fontSize: "20px",
               marginRight: "20px",
+              marginLeft: "75px",
+              marginTop: "10px",
+              marginBottom: "10px",
+              padding: "5px",
             }}
           >
             Delete
           </button>
-          <button style={{ width: "100px", height: "60px", fontSize: "20px" }}>
+          <button
+            style={{
+              width: "100px",
+              height: "40px",
+              fontSize: "20px",
+              marginTop: "10px",
+              marginBottom: "10px",
+              padding: "5px",
+            }}
+          >
             Details
           </button>
         </div>
@@ -74,35 +95,27 @@ function ResultRecordsPage() {
   };
 
   const tableContainerStyle: React.CSSProperties = {
-    width: "95%",
-    height: "calc(100vh - 250px)",
+    width: "100%",
+    height: "85%",
     overflowY: "auto" as "auto",
     marginLeft: "auto",
     marginRight: "auto",
-    paddingBottom: "20px",
+    paddingBottom: "0px",
   };
 
   const tableStyle: React.CSSProperties = {
     width: "100%",
     borderCollapse: "collapse",
+    border: "1px solid #ddd",
   };
 
   const thStyle: React.CSSProperties = {
     borderBottom: "2px solid #ddd",
     padding: "16px",
-    textAlign: "left",
+    textAlign: "center",
     fontSize: "2em",
-  };
-
-  const buttonStyle = {
-    margin: "10px 3px",
-    backgroundColor: "#4CAF50",
-    color: "white",
-    padding: "8px 16px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontSize: "1em",
+    borderRight: "1px solid #ddd",
+    backgroundColor: "#DDDDDD",
   };
 
   const downloadButtonStyle: React.CSSProperties = {
@@ -113,14 +126,17 @@ function ResultRecordsPage() {
     borderRadius: "5px",
     cursor: "pointer",
     fontSize: "1em",
-    marginBottom: "20px",
+    marginTop: "0px",
+    marginBottom: "10px",
     marginLeft: "1300px",
+    width: "130px",
+    height: "40px",
   };
 
   const paginationButtonStyle = {
     margin: "5px",
     padding: "8px 6px",
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#5555FF",
     color: "white",
     border: "none",
     borderRadius: "5px",
@@ -131,14 +147,21 @@ function ResultRecordsPage() {
   const topContainerStyle: React.CSSProperties = {
     display: "flex",
     justifyContent: "flex-end",
-    marginBottom: "20px",
+    paddingTop: "0px",
+    height: "7%",
+    width: "100%",
+    marginTop: "0px",
   };
 
   const paginationButtonContainerStyle: React.CSSProperties = {
     display: "flex",
     justifyContent: "space-between",
     width: "200px",
-    marginTop: "10px",
+    marginTop: "0px",
+  };
+
+  const mainContentStyle: React.CSSProperties = {
+    height: "93%",
   };
 
   return (
@@ -147,7 +170,7 @@ function ResultRecordsPage() {
       <div className={classes.content}>
         <div className={classes.sidebarandmaincontent}>
           <Sidebar />
-          <div className={classes.maincontent}>
+          <div className={classes.maincontent} style={mainContentStyle}>
             <div style={topContainerStyle}>
               <button style={downloadButtonStyle}>Download</button>
             </div>
