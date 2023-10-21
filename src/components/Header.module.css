@@ -1,0 +1,39 @@
+/* Header Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+  }
+
+  .logo {
+    font-size: 2rem;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .user-info span {
+    margin-right: 10px;
+  }
+  
+  .user-info button {
+    background-color: #ff6347;
+    color: #fff;
+    border: none;
+    border-radius: 20px; /* 添加圆角边框 */
+    padding: 5px 10px; 
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+    transition: background-color 0.3s ease; /* 添加过渡效果 */
+}
+
+.user-info button:hover {
+    background-color: #ff8c79; /* 鼠标悬停时的背景色 */
+}

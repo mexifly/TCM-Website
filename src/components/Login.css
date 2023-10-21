@@ -1,0 +1,74 @@
+/* Base style setup */
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+}
+
+.login-box {
+  background-color: #ffffff;
+  padding: 2em;
+  border-radius: 10px;
+  width: 390px; 
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 1.3em;
+}
+
+/* Input group */
+.input-group {
+  position: relative;
+  margin-bottom: 1.5em;
+}
+
+/* Input */
+.input-group input {
+  width: calc(100% - 1em); 
+  padding: 1em 1em 1em 4em; 
+  border-radius: 0.5em;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+/* Icon */
+.input-group i {
+  position: absolute;
+  top: 50%;
+  left: 1em;
+  transform: translateY(-50%);
+  font-size: 1.2em;
+}
+
+.icon-email::before {
+  content: "\2709";
+}
+
+.icon-password::before {
+  content: "\1F511";
+}
+
+/* Button */
+button {
+  width: 100%;
+  padding: 1em;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 0.5em;
+  cursor: pointer;
+  margin-bottom: 1em;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+/* Headline */
+.headline {
+  font-size: 1.5em;
+  color: #4CAF50;
+  text-align: center;
+  margin-bottom: 1.5em;
+}
+

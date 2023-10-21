@@ -1,0 +1,55 @@
+.testmanagementpage {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  .content {
+    flex: 1;
+    display: flex;
+  }
+  
+  .sidebarandmaincontent {
+    display: flex;
+    width: 100%;
+  }
+  
+  .sidebar {
+    width: 200px;
+  }
+  
+  .maincontent {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* 新添加的CSS样式 */
+  .imgContainer {
+    textAlign: center;
+  }
+  
+  .logoImage {
+    width: 200px;
+    height: 200px;
+    objectFit: cover;
+    marginBottom: 20px;
+  }
+  
+  .uploadBtn {
+    cursor: pointer;
+    padding: 10px 20px;
+    backgroundColor: #4CAF50;
+    color: white;
+    borderRadius: 5px;
+    border: none;
+    outline: none;
+  }
+  
+  .uploadBtn:hover {
+    background-color: #45a049;
+  }
+  
