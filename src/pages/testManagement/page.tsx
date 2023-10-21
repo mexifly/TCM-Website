@@ -15,8 +15,16 @@ function TestManagementPage() {
 
   //测试数据 Test Data
   const items = [
-    { id: 1, name: "Do you feel energetic?", description: "平和质 Neutral Constitution" },
-    { id: 2, name: "Do you feel tired easily?", description: "平和质 Neutral Constitution" },
+    {
+      id: 1,
+      name: "Do you feel energetic?",
+      description: "平和质 Neutral Constitution",
+    },
+    {
+      id: 2,
+      name: "Do you feel tired easily?",
+      description: "平和质 Neutral Constitution",
+    },
     {
       id: 3,
       name: "Comparing to people around you, do you always feel colder and need to wear more clothes to keep warm?",
@@ -47,13 +55,21 @@ function TestManagementPage() {
       name: "Do you have difficulties falling asleep at night?",
       description: "平和质 Neutral Constitution",
     },
-    { id: 9, name: "Do you feel tired easily?", description: "气虚质 Qi Deficient Constitution" },
+    {
+      id: 9,
+      name: "Do you feel tired easily?",
+      description: "气虚质 Qi Deficient Constitution",
+    },
     {
       id: 10,
       name: "Do you feel shortness of breath easily?",
       description: "气虚质 Qi Deficient Constitution",
     },
-    { id: 11, name: "Does your voice sound too soft? ", description: "气虚质 Qi Deficient Constitution" },
+    {
+      id: 11,
+      name: "Does your voice sound too soft? ",
+      description: "气虚质 Qi Deficient Constitution",
+    },
     {
       id: 12,
       name: "Do you experience fast heartbeat easily?",
