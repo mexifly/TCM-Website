@@ -1,14 +1,40 @@
 import React, { useState } from "react";
 import "./Login.css";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Link,
+  useNavigate,
+} from "react-router-dom";
+import axios from "axios";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const handleLogin = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // handle login logic
+
+    try {
+      const response = await axios.post("http://localhost:3000/login", {
+        email: email,
+        password: password,
+      });
+      const user = response.data;
+
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+
+        navigate("/main");
+      } else {
+        alert("Invalid login credentials.");
+      }
+    } catch (error) {
+      // Handle the error based on the error response from your backend
+      console.error("Login error:", error);
+      alert("Login failed. Please try again.");
+    }
   };
 
   return (
@@ -43,9 +69,7 @@ const Login: React.FC = () => {
             />
           </div>
 
-          <Link to="/main">
-            <button type="submit">Login</button>
-          </Link>
+          <button type="submit">Login</button>
         </form>
       </div>
     </div>
