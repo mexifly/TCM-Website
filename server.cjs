@@ -22,7 +22,12 @@ db.connect((err) => {
 });
 
 // 中间件，用于解析请求体中的 JSON 数据
-app.use(express.json());
+//app.use(express.json());
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 // Get all questions
 app.get("/questions", (req, res) => {
