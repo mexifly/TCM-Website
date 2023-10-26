@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link, Route, useParams } from "react-router-dom";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import classes from "../ContentPage.module.css";
@@ -55,12 +56,9 @@ function TestManagementPage() {
                     <td style={tdStyle}>{item.questionContent}</td>
                     <td style={tdStyle}>{item.type}</td>
                     <td>
-                      <button
-                        style={buttonStyle}
-                        onClick={() => handleModify(item.questionId)}
-                      >
-                        Modify
-                      </button>
+                      <Link to={`/modify_question/${item.questionId}`}>
+                        <button style={buttonStyle}>Modify</button>
+                      </Link>
                     </td>
                   </tr>
                 ))}
