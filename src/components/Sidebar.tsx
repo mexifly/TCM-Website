@@ -8,17 +8,17 @@ function Sidebar() {
     <nav className={classes.sidebar}>
       <ul>
         <li>
-          <Link to="/pages/testManagement">Test Management</Link>
+          <Link to="/pages/testManagement">Question Maintenance</Link>
         </li>
         <li>
-          <Link to="/pages/resultRecords">Result Records</Link>
+          <Link to="/pages/resultSettings">Result Maintenance</Link>
+        </li>
+        <li>
+          <Link to="/pages/resultRecords">Test Result Records</Link>
         </li>
         <li>
           <span>System Settings</span>
           <ul>
-            <li>
-              <Link to="/pages/settings/resultSettings">Result Settings</Link>
-            </li>
             <li>
               <Link to="/pages/settings/logoSettings">Logo Settings</Link>
             </li>

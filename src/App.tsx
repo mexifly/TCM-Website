@@ -16,6 +16,9 @@ const App = () => {
         <Route
           path="/pages/testManagement"
           element={<TestManagementPage></TestManagementPage>}
+        ></Route><Route
+          path="/pages/resultSettings"
+          element={<ResultSettingsPage></ResultSettingsPage>}
         ></Route>
         <Route
           path="/pages/resultRecords"
@@ -29,10 +32,7 @@ const App = () => {
           path="/pages/settings/logoSettings"
           element={<LogoSettingsPage></LogoSettingsPage>}
         ></Route>
-        <Route
-          path="/pages/settings/resultSettings"
-          element={<ResultSettingsPage></ResultSettingsPage>}
-        ></Route>
+        
       </Routes>
     </Router>
   );
