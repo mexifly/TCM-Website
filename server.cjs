@@ -22,10 +22,15 @@ db.connect((err) => {
 });
 
 // 中间件，用于解析请求体中的 JSON 数据
-//app.use(express.json());
+app.use(express.json());
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+
   next();
 });
 
@@ -53,7 +58,7 @@ app.get("/questions/:questionId", (req, res) => {
       return;
     }
     if (results.length === 0) {
-      res.status(404).json({ error: "问题不存在" });
+      res.status(404).json({ error: "问题不存在 Unable to get question" });
       return;
     }
     res.json(results[0]);
@@ -63,9 +68,14 @@ app.get("/questions/:questionId", (req, res) => {
 // Update question
 app.put("/questions/:questionId", (req, res) => {
   const questionId = req.params.questionId;
-  const { questionContent } = req.body;
-  const query = "UPDATE questions SET questionContent = ? WHERE questionId = ?";
-  db.query(query, [questionContent, questionId], (err, result) => {
+  const { questionContent, type } = req.body;
+  const query =
+    "UPDATE questions SET questionContent = ?, type = ? WHERE questionId = ?";
+
+  console.log("Request Body:", req.body);
+  console.log("SQL Query:", query);
+
+  db.query(query, [questionContent, type, questionId], (err, result) => {
     if (err) {
       console.error("Update question failed:", err);
       res.status(500).json({ error: "无法更新问题 Unable to update question" });
@@ -81,7 +91,9 @@ app.get("/constitution_results", (req, res) => {
   db.query(query, (err, results) => {
     if (err) {
       console.error("获取失败 Get constitution_results failed:", err);
-      res.status(500).json({ error: "无法更新 Unable to get constitution_results" });
+      res
+        .status(500)
+        .json({ error: "无法更新 Unable to get constitution_results" });
       return;
     }
     res.json(results);
@@ -95,7 +107,10 @@ app.get("/constitution_results/:consId", (req, res) => {
   db.query(query, [consId], (err, results) => {
     if (err) {
       console.error("获取失败 Get constitution_results failed:", err);
-      res.status(500).json({ error: "无法获取constitution_results Unable to get constitution_results" });
+      res.status(500).json({
+        error:
+          "无法获取constitution_results Unable to get constitution_results",
+      });
       return;
     }
     if (results.length === 0) {
@@ -136,12 +151,10 @@ app.put("/constitution_results/:consId", (req, res) => {
     (err, result) => {
       if (err) {
         console.error("更新失败 Update constitution_results failed:", err);
-        res
-          .status(500)
-          .json({
-            error:
-              "Unable to Update constitution_results 无法更新constitution_results",
-          });
+        res.status(500).json({
+          error:
+            "Unable to Update constitution_results 无法更新 constitution_results",
+        });
         return;
       }
       res.json({ message: "记录已成功更新" });
