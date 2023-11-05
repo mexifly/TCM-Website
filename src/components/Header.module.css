@@ -1,39 +1,106 @@
 /* Header Styles */
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #333;
-    color: #fff;
-    padding: 10px 20px;
-  }
-
-  .logo {
-    font-size: 2rem;
-    color: white;
-    font-weight: bold;
-  }
-  
-  .user-info {
-    display: flex;
-    align-items: center;
-  }
-  
-  .user-info span {
-    margin-right: 10px;
-  }
-  
-  .user-info button {
-    background-color: #ff6347;
-    color: #fff;
-    border: none;
-    border-radius: 20px; /* 添加圆角边框 */
-    padding: 5px 10px; 
-    cursor: pointer;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
-    transition: background-color 0.3s ease; /* 添加过渡效果 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
 }
 
-.user-info button:hover {
-    background-color: #ff8c79; /* 鼠标悬停时的背景色 */
+.logo {
+  font-size: 2rem;
+  color: white;
+  font-weight: bold;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-right: 50px;
+  position: relative; /* 要添加定位以便放置下拉菜单 */
+}
+
+
+.user-info span {
+  margin-right: 20px;
+}
+
+.user-info button,
+.dropdown-menu button { /* 同样的样式用于下拉菜单内的按钮 */
+  background-color: rgb(71, 212, 255);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.user-info button:hover,
+.dropdown-menu button:hover { /* 鼠标悬停效果也应用于下拉菜单内的按钮 */
+  background-color: #ff8c79;
+}
+
+/* 新增头像和下拉菜单的样式 */
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-left: 15px; /* 添加一些左边距 */
+  cursor: pointer;
+}
+
+/* 初始状态，下拉菜单不可见 */
+.dropdown-menu {
+  visibility: hidden;
+  display: block; /* 或者可以用 visibility:hidden; 并在 .dropdown-menu.show 中设置 visibility:visible; */
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #fff;
+  color: #333;
+  border: 1px solid transparent; /* 隐藏边框 */
+  border-radius: 4px;
+  padding: 0;
+  max-height: 0; /* 设置最大高度为0，隐藏内容 */
+  overflow: hidden; /* 确保内容不会溢出 */
+  transition: max-height 0.3s ease, padding 0.3s ease, border 0.3s ease; /* 过渡效果 */
+  z-index: 1000;
+}
+
+/* 展开状态 */
+.dropdown-menu.show {
+  visibility: visible;
+  padding: 5px 0;
+  max-height: 300px; /* 根据实际内容高度调整 */
+  border: 1px solid #ccc; /* 展开时显示边框 */
+  transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out, border 0.5s ease-in-out; /* 过渡效果 */
+}
+
+
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border-radius: 0; /* 重置这里的 border-radius 为 0 */
+}
+
+.dropdown-icon {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent; /* 左边透明边框 */
+  border-right: 5px solid transparent; /* 右边透明边框 */
+  border-bottom: 5px solid #fff; /* 下边较宽的白色边框形成倒立三角形 */
+  cursor: pointer;
+  position: absolute;
+  top: 50%; /* 定位于用户头像的垂直中心 */
+  right: -15px; /* 根据需要调整 */
+  transform: translateY(-50%); /* 确保三角形垂直居中 */
+}
+
+.dropdown-icon.rotate {
+  transform: translateY(-50%) rotate(180deg); /* 添加旋转效果 */
+  transition: transform 0.3s ease; /* 确保有平滑的过渡动画 */
 }
