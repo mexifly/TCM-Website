@@ -11,7 +11,7 @@ function Sidebar() {
           <Link to="/pages/testManagement">Question Maintenance</Link>
         </li>
         <li>
-          <Link to="/pages/settings/resultSettings">Result Maintenance</Link>
+          <Link to="/pages/resultSettings">Result Maintenance</Link>
         </li>
         <li>
           <Link to="/pages/resultRecords">Test Result Records</Link>

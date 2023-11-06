@@ -6,6 +6,7 @@ import ResultRecordsPage from "./pages/resultRecords/page";
 import AccountSettingsPage from "./pages/settings/accountSettings/page";
 import LogoSettingsPage from "./pages/settings/logoSettings/page";
 import ResultSettingsPage from "./pages/settings/resultSettings/page";
+import ModifyQuestionPage from "./pages/modifyQuestion/page";
 
 const App = () => {
   return (
@@ -16,6 +17,10 @@ const App = () => {
         <Route
           path="/pages/testManagement"
           element={<TestManagementPage></TestManagementPage>}
+        ></Route>
+        <Route
+          path="/modify_question/:questionId"
+          element={<ModifyQuestionPage></ModifyQuestionPage>}
         ></Route>
         <Route
           path="/pages/resultRecords"
@@ -30,7 +35,7 @@ const App = () => {
           element={<LogoSettingsPage></LogoSettingsPage>}
         ></Route>
         <Route
-          path="/pages/settings/resultSettings"
+          path="/pages/resultSettings"
           element={<ResultSettingsPage></ResultSettingsPage>}
         ></Route>
       </Routes>
