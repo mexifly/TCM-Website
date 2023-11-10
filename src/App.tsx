@@ -5,8 +5,9 @@ import TestManagementPage from "./pages/testManagement/page";
 import ResultRecordsPage from "./pages/resultRecords/page";
 import AccountSettingsPage from "./pages/settings/accountSettings/page";
 import LogoSettingsPage from "./pages/settings/logoSettings/page";
-import ResultSettingsPage from "./pages/settings/resultSettings/page";
+import ConstitutionSettingsPage from "./pages/constitutionSettings/page";
 import ModifyQuestionPage from "./pages/modifyQuestion/page";
+import ModifyConstitutionPage from "./pages/modifyConstitution/page";
 
 const App = () => {
   return (
@@ -23,8 +24,12 @@ const App = () => {
           element={<ModifyQuestionPage></ModifyQuestionPage>}
         ></Route>
         <Route
-          path="/pages/resultSettings"
-          element={<ResultSettingsPage></ResultSettingsPage>}
+          path="/pages/constitutionSettings"
+          element={<ConstitutionSettingsPage></ConstitutionSettingsPage>}
+        ></Route>
+        <Route
+          path="/modify_constitution/:consId"
+          element={<ModifyConstitutionPage></ModifyConstitutionPage>}
         ></Route>
         <Route
           path="/pages/resultRecords"

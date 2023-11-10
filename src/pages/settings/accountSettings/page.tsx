@@ -56,7 +56,7 @@ function AccountSettingsPage() {
                 <tr>
                   <th style={thStyle}>ID</th>
                   <th style={thStyle}>User Name</th>
-                  <th style={thStyle}>权限</th>
+                  <th style={thStyle}>Permission</th>
                   <th style={thStyle}>Modify</th>
                   <th style={thStyle}>Delete</th>
                 </tr>

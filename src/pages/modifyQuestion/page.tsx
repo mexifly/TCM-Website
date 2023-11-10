@@ -76,7 +76,7 @@ function ModifyQuestionPage() {
             <Sidebar />
             <div className={classes.maincontent}>
               <h1 className={classes.heading}>
-                Modify Question - ID: {questionId}
+                Modify Question Information - ID: {questionId}
               </h1>
               <div className={classes.formGroup}>
                 <label className={classes.label}>Constitution Type:</label>

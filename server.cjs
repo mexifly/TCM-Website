@@ -114,7 +114,9 @@ app.get("/constitution_results/:consId", (req, res) => {
       return;
     }
     if (results.length === 0) {
-      res.status(404).json({ error: "记录不存在" });
+      res
+        .status(404)
+        .json({ error: "记录不存在 Unable to get constitution_results" });
       return;
     }
     res.json(results[0]);
@@ -157,7 +159,7 @@ app.put("/constitution_results/:consId", (req, res) => {
         });
         return;
       }
-      res.json({ message: "记录已成功更新" });
+      res.json({ message: "记录已成功更新 Update successfully" });
     }
   );
 });
