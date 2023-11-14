@@ -1,35 +1,44 @@
-// components/Sidebar.js
 import React from "react";
-import { Link } from "react-router-dom";
-import classes from "./Sidebar.module.css";
+import { Link, useLocation } from "react-router-dom";
+import Accordion from "react-bootstrap/Accordion";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-function Sidebar() {
+const Sidebar = () => {
+  const location = useLocation();
+  // Check if the current path starts with "/pages/settings" and set the active key accordingly
+  const activeKey = location.pathname.startsWith("/pages/settings") ? "0" : "";
+
   return (
-    <nav className={classes.sidebar}>
-      <ul>
-        <li>
-          <Link to="/pages/testManagement">Question Maintenance</Link>
-        </li>
-        <li>
-          <Link to="/pages/resultSettings">Result Maintenance</Link>
-        </li>
-        <li>
-          <Link to="/pages/resultRecords">Test Result Records</Link>
-        </li>
-        <li>
-          <span>System Settings</span>
-          <ul>
-            <li>
-              <Link to="/pages/settings/logoSettings">Logo Settings</Link>
-            </li>
-            <li>
-              <Link to="/pages/settings/accountSettings">Account Settings</Link>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </nav>
+    <div
+      className="d-flex flex-column flex-shrink-0 p-3 bg-light"
+      style={{ width: "250px" }}
+    >
+      <nav className="nav nav-pills flex-column">
+        <Link className="nav-link" to="/pages/testManagement">
+          Test Management
+        </Link>
+        <Link className="nav-link" to="/pages/resultSettings">
+          Result Settings
+        </Link>
+        <Link className="nav-link" to="/pages/resultRecords">
+          Test Result Records
+        </Link>
+        <Accordion defaultActiveKey={activeKey}>
+          <Accordion.Item eventKey="0">
+            <Accordion.Header>System Settings</Accordion.Header>
+            <Accordion.Body>
+              <Link className="nav-link" to="/pages/settings/logoSettings">
+                Logo Settings
+              </Link>
+              <Link className="nav-link" to="/pages/settings/accountSettings">
+                Account Settings
+              </Link>
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
+      </nav>
+    </div>
   );
-}
+};
 
 export default Sidebar;

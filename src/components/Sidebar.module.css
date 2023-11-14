@@ -1,26 +1,66 @@
-/* Sidebar Styles */
 .sidebar {
-    background-color: #333;
-    color: #fff;
-    width: 250px;
-    min-height: 100vh;
-    padding: 20px;
-  }
-  
-  .sidebar ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .sidebar li {
-    margin-bottom: 10px;
-  }
-  
-  .sidebar a {
-    text-decoration: none;
-    color: #fff;
-  }
-  
-  .sidebar ul ul {
-    margin-left: 20px;
-  }
+  background-color: #333;
+  color: #fff;
+  width: 250px;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* Doubling the padding for .nav-link to increase the height */
+.nav-link {
+  text-decoration: none;
+  color: #444141;
+  display: block;
+  padding: 50px 0; /* Increased padding to double the height */
+  margin-bottom: 500px; /* Increased margin to add space between menu items */
+}
+
+/* Adjusting the Accordion Header to match the .nav-link padding */
+.accordion-button {
+  padding: 20px 0; /* Increased padding to double the height */
+}
+
+/* Hover effect for links and accordion button when not collapsed */
+.nav-link:hover,
+.nav-link:active,
+.accordion-button:not(.collapsed) {
+  background-color: #636060; /* Light gray */
+  color: #333; /* Optionally change the font color if needed */
+}
+
+.menuItem {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.triangle {
+  display: inline-block;
+  transition: transform 0.3s;
+  margin-left: 5px; /* Adjust spacing between the text and triangle */
+}
+
+.rotated {
+  transform: rotate(180deg);
+}
+
+.submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.submenuOpen {
+  max-height: 500px; /* Adjust this value based on the actual height needed */
+  transition: max-height 0.3s ease-in;
+}
+
+/* Styles for Bootstrap accordion button hover state */
+.accordion-button:not(.collapsed):hover {
+  background-color: #615e5e; /* Light gray */
+}
+
+/* Styles for Bootstrap accordion body link hover state */
+.accordion-body a:hover {
+  background-color: #6b6868; /* Light gray */
+}

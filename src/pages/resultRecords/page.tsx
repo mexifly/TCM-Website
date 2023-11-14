@@ -165,7 +165,7 @@ function ResultRecordsPage() {
   };
 
   return (
-    <div className={classes.testmanagementpage}>
+    <div>
       <Header />
       <div className={classes.content}>
         <div className={classes.sidebarandmaincontent}>

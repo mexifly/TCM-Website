@@ -7,6 +7,9 @@ import AccountSettingsPage from "./pages/settings/accountSettings/page";
 import LogoSettingsPage from "./pages/settings/logoSettings/page";
 import ResultSettingsPage from "./pages/settings/resultSettings/page";
 import ModifyQuestionPage from "./pages/modifyQuestion/page";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import AdminManagement from "./pages/adminInfo/page";
 
 const App = () => {
   return (
@@ -37,6 +40,10 @@ const App = () => {
         <Route
           path="/pages/resultSettings"
           element={<ResultSettingsPage></ResultSettingsPage>}
+        ></Route>
+        <Route
+          path="/pages/admininfo"
+          element={<AdminManagement></AdminManagement>}
         ></Route>
       </Routes>
     </Router>

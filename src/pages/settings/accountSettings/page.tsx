@@ -1,48 +1,61 @@
+import React, { useEffect, useState } from "react";
 import Header from "../../../components/Header";
 import Sidebar from "../../../components/Sidebar";
 import classes from "../../ContentPage.module.css";
 
+interface AdminItem {
+  adminId: number;
+  adminFirstName: string;
+  adminLastName: string;
+  adminEmail: string;
+  adminAddress: string;
+  adminPhoneNumber: string;
+  // Add any other fields that your items might have
+}
+
 function AccountSettingsPage() {
-  const handleModify = (itemId: number) => {
-    // TODO 修改操作
-    console.log(`Modify item with ID: ${itemId}`);
+  const [items, setItems] = useState<AdminItem[]>([]);
+
+  useEffect(() => {
+    // Fetch data from backend
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/admins"); // Adjust the API endpoint as needed
+      const data = await response.json();
+      setItems(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
-  const handleDelete = (itemId: number) => {
-    // TODO 删除操作
-    console.log(`Delete item with ID: ${itemId}`);
-  };
+  const handleDelete = async (adminId: number) => {
+    if (
+      window.confirm(
+        `Are you sure you want to delete admin with ID: ${adminId}?`
+      )
+    ) {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/deleteAdmin/${adminId}`,
+          {
+            method: "DELETE",
+          }
+        );
 
-  //测试数据 Test Data
-  const items = [
-    { id: 1, name: "Andy", description: "Admin" },
-    { id: 2, name: "Lily", description: "Admin" },
-    {
-      id: 3,
-      name: "Mike",
-      description: "Admin",
-    },
-    {
-      id: 4,
-      name: "Cindy",
-      description: "Admin",
-    },
-    {
-      id: 5,
-      name: "Jack",
-      description: "Admin",
-    },
-    {
-      id: 6,
-      name: "Fairleigh",
-      description: "Admin",
-    },
-    {
-      id: 7,
-      name: "Dickinson",
-      description: "Admin",
-    },
-  ];
+        if (!response.ok) {
+          throw new Error("Error deleting admin");
+        }
+
+        // Refresh the list after deletion
+        fetchData();
+      } catch (error) {
+        console.error("Error during deletion:", error);
+      }
+    }
+  };
 
   return (
     <div className={classes.testmanagementpage}>
@@ -50,41 +63,64 @@ function AccountSettingsPage() {
       <div className={classes.content}>
         <div className={classes.sidebarandmaincontent}>
           <Sidebar />
-          <div className={classes.maincontent}>
+          <div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                height: "60px",
+                marginBottom: "30px",
+              }}
+            >
+              <button
+                style={{
+                  width: "200px",
+                  marginLeft: "20px",
+                  marginTop: "20px",
+                }}
+              >
+                Add New Administrator
+              </button>
+            </div>
             <table style={tableStyle}>
               <thead>
                 <tr>
                   <th style={thStyle}>ID</th>
-                  <th style={thStyle}>User Name</th>
-                  <th style={thStyle}>权限</th>
-                  <th style={thStyle}>Modify</th>
+                  <th style={thStyle}>First Name</th>
+                  <th style={thStyle}>Last Name</th>
+                  <th style={thStyle}>Email</th>
+                  <th style={thStyle}>Address</th>
+                  <th style={thStyle}>Phone Number</th>
                   <th style={thStyle}>Delete</th>
                 </tr>
               </thead>
               <tbody>
-                {items.map((item) => (
-                  <tr key={item.id}>
-                    <td style={tdStyle}>{item.id}</td>
-                    <td style={tdStyle}>{item.name}</td>
-                    <td style={tdStyle}>{item.description}</td>
-                    <td style={buttonColumnStyle}>
-                      <button
-                        style={buttonStyleModify}
-                        onClick={() => handleModify(item.id)}
-                      >
-                        Modify
-                      </button>
-                    </td>
-                    <td style={buttonColumnStyle}>
-                      <button
-                        style={buttonStyleDelete}
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        Delete
-                      </button>
+                {items && items.length > 0 ? (
+                  items.map((item) => (
+                    <tr key={item.adminId}>
+                      <td style={tdStyle}>{item.adminId}</td>
+                      <td style={tdStyle}>{item.adminFirstName}</td>
+                      <td style={tdStyle}>{item.adminLastName}</td>
+                      <td style={tdStyle}>{item.adminEmail}</td>
+                      <td style={tdStyle}>{item.adminAddress}</td>
+                      <td style={tdStyle}>{item.adminPhoneNumber}</td>
+                      <td style={buttonColumnStyle}>
+                        <button
+                          style={buttonStyleDelete}
+                          onClick={() => handleDelete(item.adminId)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={7} style={tdStyle}>
+                      Loading data...
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
@@ -94,10 +130,18 @@ function AccountSettingsPage() {
   );
 }
 
+const contentMain: React.CSSProperties = {
+  flex: 1,
+  padding: "30px", // assuming 20px
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+};
 // 定义内联样式 Define inline style
 const tableStyle: React.CSSProperties = {
-  width: "100%",
+  width: "1600px",
   borderCollapse: "collapse",
+  marginLeft: "10px",
 };
 
 const thStyle: React.CSSProperties = {

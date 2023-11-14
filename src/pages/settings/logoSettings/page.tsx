@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Header from "../../../components/Header";
 import Sidebar from "../../../components/Sidebar";
 import classes from "../../ContentPage.module.css";
@@ -6,22 +7,51 @@ import classes from "../../ContentPage.module.css";
 function LogoSettingsPage() {
   const [logo, setLogo] = useState<string | null>(null);
 
+  useEffect(() => {
+    // 获取当前的logo
+    axios
+      .get("http://localhost:3000/currentLogo")
+      .then((response) => {
+        setLogo(response.data.logoUrl);
+      })
+      .catch((error) => {
+        console.error("Error fetching logo:", error);
+      });
+  }, []);
+
   const onImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogo(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append("logo", file);
+
+      axios
+        .post("http://localhost:3000/uploadLogo", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          // 更新logo的URL状态
+          // 这里假设后端返回的字段是 data.path
+          setLogo(response.data.logoUrl);
+        })
+        .catch((error) => {
+          console.error("Error uploading logo:", error);
+        });
     }
   };
 
+  // 样式对象
   const mainContentStyle: React.CSSProperties = {
     padding: "0",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   };
+
   return (
-    <div className={classes.testmanagementpage}>
+    <div>
       <Header />
       <div className={classes.content}>
         <div className={classes.sidebarandmaincontent}>
@@ -30,37 +60,55 @@ function LogoSettingsPage() {
             <div
               style={{
                 height: "200px",
-                marginTop: "0",
-                width: "1630px",
+                width: "100%",
                 textAlign: "center",
                 verticalAlign: "middle",
                 paddingTop: "60px",
                 fontSize: "3em",
                 fontFamily: "sans-serif",
+                marginLeft: "500px",
               }}
             >
               Setting New Website Logo
             </div>
             <div
               style={{
-                textAlign: "center",
-                marginBottom: "250px",
-                height: "500px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                marginBottom: "100px",
+                marginLeft: "500px",
               }}
             >
-              <img
-                src={logo || "path_to_default_logo"}
-                alt="Website Logo"
+              <div
                 style={{
-                  width: "200px",
-                  height: "200px",
-                  objectFit: "cover",
-                  marginBottom: "200px",
+                  width: "400px",
+                  height: "400px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                   border: "1px solid #ddd",
-                  marginTop: "100px",
+                  marginBottom: "100px",
+                  backgroundColor: "#f8f8f8",
+                  color: "#ccc",
+                  fontSize: "20px",
+                  fontFamily: "Arial, sans-serif",
                 }}
-              />
-              <br />
+              >
+                {logo ? (
+                  <img
+                    src={logo}
+                    alt="Website Logo"
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                ) : (
+                  "No Logo Available"
+                )}
+              </div>
               <input
                 type="file"
                 accept="image/*"
@@ -72,15 +120,13 @@ function LogoSettingsPage() {
                 htmlFor="logoUpload"
                 style={{
                   cursor: "pointer",
-                  paddingTop: "50px",
+                  display: "inline-block",
+                  marginTop: "20px",
                   backgroundColor: "#4CAF50",
                   color: "white",
                   borderRadius: "5px",
-                  width: "300px",
-                  height: "150px",
-                  textAlign: "center",
-                  verticalAlign: "middler",
-                  fontSize: "2em",
+                  padding: "10px 20px",
+                  fontSize: "1em",
                 }}
               >
                 Upload New Logo
