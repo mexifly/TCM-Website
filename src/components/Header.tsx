@@ -50,7 +50,10 @@ function Header() {
 
           <div className={dropdownMenuClass}>
             <Link to="/pages/admininfo">
-              <button>Settings</button>
+              <button>Account Information</button>
+            </Link>
+            <Link to="/pages/password">
+              <button>Change Password</button>
             </Link>
             <Link to="/">
               <button>Exit</button>

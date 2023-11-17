@@ -15,10 +15,10 @@ const Sidebar = () => {
     >
       <nav className="nav nav-pills flex-column">
         <Link className="nav-link" to="/pages/testManagement">
-          Test Management
+          Question Maintenance
         </Link>
-        <Link className="nav-link" to="/pages/resultSettings">
-          Result Settings
+        <Link className="nav-link" to="/pages/constitutionSettings">
+          Constitution Maintenance
         </Link>
         <Link className="nav-link" to="/pages/resultRecords">
           Test Result Records

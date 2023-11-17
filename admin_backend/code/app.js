@@ -12,6 +12,7 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, '../../public')));
 
 
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, path.join(__dirname, '../../public')); // 确保此目录存在
@@ -267,6 +268,212 @@ app.delete('/deleteAdmin/:adminId', (req, res) => {
         res.json({ message: `Admin with ID ${adminId} deleted successfully` });
     });
 });
+
+app.post('/api/change-password', async (req, res) => {
+    const { adminId, currentPassword, newPassword } = req.body;
+
+    if (!adminId || !currentPassword || !newPassword) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+        const queryResult = await pool.promise().query('SELECT adminPassword FROM admininfo WHERE adminId = ?', [adminId]);
+        const users = queryResult[0];
+
+        if (users.length === 0) {
+            return res.status(404).json({ error: 'Admin not found' });
+        }
+
+        const user = users[0];
+
+        const validPassword = await argon2.verify(user.adminPassword, currentPassword);
+        if (!validPassword) {
+            return res.status(401).json({ error: 'Invalid current password' });
+        }
+
+        const hashedPassword = await argon2.hash(newPassword);
+        await pool.promise().query('UPDATE admininfo SET adminPassword = ? WHERE adminId = ?', [hashedPassword, adminId]);
+
+        res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+        console.error('Error during password update:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+app.post('/api/Add_New_Admin', upload.single('adminPhoto'), async (req, res) => {
+    try {
+        // 解构请求体中的数据
+        const { adminFirstName, adminLastName, adminEmail, adminPassword, adminAddress, adminPhoneNumber } = req.body;
+        
+        // 验证必要字段
+        if (!adminFirstName || !adminLastName || !adminEmail || !adminPassword) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        // 使用 Argon2 加密密码
+        const hashedPassword = await argon2.hash(adminPassword);
+
+        // 将管理员信息插入到 admininfo 表中
+        const insertAdminResult = await pool.promise().query('INSERT INTO admininfo (adminFirstName, adminLastName, adminEmail, adminPassword, adminAddress, adminPhoneNumber) VALUES (?, ?, ?, ?, ?, ?)', [adminFirstName, adminLastName, adminEmail, hashedPassword, adminAddress, adminPhoneNumber]);
+        const adminId = insertAdminResult[0].insertId;
+
+        // 处理上传的头像文件
+        if (req.file) {
+            const file = req.file;
+            const newFile = {
+                adminId: adminId,
+                name: file.filename,
+                description: 'Admin Photo',
+                type: 'photo',
+                size: file.size,
+                path: `/${file.filename}`,
+                status: 'active'
+            };
+
+            // 将文件信息插入到 files 表中
+            await pool.promise().query('INSERT INTO files SET ?', newFile);
+
+            // 更新 admininfo 表中的 avatar 字段
+            await pool.promise().query('UPDATE admininfo SET avatar = ? WHERE adminId = ?', [newFile.path, adminId]);
+        }
+
+        res.json({ message: 'Admin added successfully', adminId: adminId });
+    } catch (error) {
+        console.error('Error adding admin:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+// Get all questions
+app.get("/questions", (req, res) => {
+    const query = "SELECT * FROM questions";
+    pool.query(query, (err, results) => {
+      if (err) {
+        console.error("Get question failed:", err);
+        res.status(500).json({ error: "Unable to get question" });
+        return;
+      }
+      res.json(results);
+    });
+  });
+  
+  // Get one question by questionId
+  app.get("/questions/:questionId", (req, res) => {
+    const questionId = req.params.questionId;
+    const query = "SELECT * FROM questions WHERE questionId = ?";
+    pool.query(query, [questionId], (err, results) => {
+      if (err) {
+        console.error("Get question failed:", err);
+        res.status(500).json({ error: "Unable to get question" });
+        return;
+      }
+      if (results.length === 0) {
+        res.status(404).json({ error: "问题不存在 Unable to get question" });
+        return;
+      }
+      res.json(results[0]);
+    });
+  });
+  
+  // Update question
+  app.put("/questions/:questionId", (req, res) => {
+    const questionId = req.params.questionId;
+    const { questionContent, type } = req.body;
+    const query =
+      "UPDATE questions SET questionContent = ?, type = ? WHERE questionId = ?";
+  
+    pool.query(query, [questionContent, type, questionId], (err, result) => {
+      if (err) {
+        console.error("Update question failed:", err);
+        res.status(500).json({ error: "无法更新问题 Unable to update question" });
+        return;
+      }
+      res.json({ message: "更新成功 Update question successfully" });
+    });
+  });
+  
+  // Get all constitution_results
+  app.get("/constitution_results", (req, res) => {
+    const query = "SELECT * FROM constitution_results";
+    pool.query(query, (err, results) => {
+      if (err) {
+        console.error("获取失败 Get constitution_results failed:", err);
+        res
+          .status(500)
+          .json({ error: "无法更新 Unable to get constitution_results" });
+        return;
+      }
+      res.json(results);
+    });
+  });
+  
+  // 获取单个constitution_results
+  app.get("/constitution_results/:consId", (req, res) => {
+    const consId = req.params.consId;
+    const query = "SELECT * FROM constitution_results WHERE consId = ?";
+    pool.query(query, [consId], (err, results) => {
+      if (err) {
+        console.error("获取失败 Get constitution_results failed:", err);
+        res.status(500).json({
+          error:
+            "无法获取constitution_results Unable to get constitution_results",
+        });
+        return;
+      }
+      if (results.length === 0) {
+        res
+          .status(404)
+          .json({ error: "记录不存在 Unable to get constitution_results" });
+        return;
+      }
+      res.json(results[0]);
+    });
+  });
+  
+  // Update constitution_results
+  app.put("/constitution_results/:consId", (req, res) => {
+    const consId = req.params.consId;
+    const {
+      consType,
+      definition,
+      disturbance,
+      cause,
+      vigilant,
+      improvement,
+      recommondRecipe,
+    } = req.body;
+  
+    const query =
+      "UPDATE constitution_results SET consType = ?, definition = ?, disturbance = ?, cause = ?, vigilant = ?, improvement = ?, recommondRecipe = ? WHERE consId = ?";
+    pool.query(
+      query,
+      [
+        consType,
+        definition,
+        disturbance,
+        cause,
+        vigilant,
+        improvement,
+        recommondRecipe,
+        consId,
+      ],
+      (err, result) => {
+        if (err) {
+          console.error("更新失败 Update constitution_results failed:", err);
+          res.status(500).json({
+            error:
+              "Unable to Update constitution_results 无法更新 constitution_results",
+          });
+          return;
+        }
+        res.json({ message: "记录已成功更新 Update successfully" });
+      }
+    );
+  });
+
 
 app.listen(3000, () => {
     console.log('Listening on port 3000...');

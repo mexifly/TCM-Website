@@ -10,6 +10,9 @@ import ModifyQuestionPage from "./pages/modifyQuestion/page";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import AdminManagement from "./pages/adminInfo/page";
+import ChangePassword from "./pages/password/page";
+import ConstitutionSettingsPage from "./pages/constitutionSettings/page";
+import ModifyConstitutionPage from "./pages/modifyConstitution/page";
 
 const App = () => {
   return (
@@ -44,6 +47,18 @@ const App = () => {
         <Route
           path="/pages/admininfo"
           element={<AdminManagement></AdminManagement>}
+        ></Route>
+        <Route
+          path="/pages/password"
+          element={<ChangePassword></ChangePassword>}
+        ></Route>
+        <Route
+          path="/pages/constitutionSettings"
+          element={<ConstitutionSettingsPage></ConstitutionSettingsPage>}
+        ></Route>
+        <Route
+          path="/modify_constitution/:consId"
+          element={<ModifyConstitutionPage></ModifyConstitutionPage>}
         ></Route>
       </Routes>
     </Router>
