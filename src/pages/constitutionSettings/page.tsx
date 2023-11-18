@@ -1,29 +1,52 @@
 import React, { useEffect, useState } from "react";
-import { Link, Route, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import classes from "../ContentPage.module.css";
 
 function ConstitutionSettingsPage() {
   const [items, setItems] = useState([]);
+  const [originalItems, setOriginalItems] = useState([]);
+  const [selectedType, setSelectedType] = useState("");
+
   useEffect(() => {
-    // 使用fetch来获取数据
     fetch("http://localhost:3000/constitution_results")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        return response.json(); // 解析JSON响应
+        return response.json();
       })
-      .then((items) => {
-        // 更新items状态以触发重新渲染
-        setItems(items);
-        console.log(items);
+      .then((fetchedItems) => {
+        setItems(fetchedItems);
+        setOriginalItems(fetchedItems); // 保存原始数据
+        console.log(fetchedItems);
       })
       .catch((error) => {
         console.error("There was a problem with the fetch operation:", error);
       });
-  }, []); // 空数组表示仅在组件加载时运行
+  }, []);
+
+  useEffect(() => {
+    // 根据选定的类型筛选原始数据
+    const filteredItems = selectedType
+      ? originalItems.filter((item) => item.consType === selectedType)
+      : originalItems;
+    setItems(filteredItems);
+  }, [selectedType, originalItems]); // 监听selectedType和originalItems的变化
+
+  // 下拉框选项
+  const constitutionTypes = [
+    "Neutral Constitution",
+    "Qi Deficient Constitution",
+    "Yang Deficient Constitution",
+    "Yin Deficient Constitution",
+    "Phlegm-Dampness Constitution",
+    "Damp-Heat Constitution",
+    "Blood Stasis Constitution",
+    "Qi-Stagnation Constitution",
+    "Intrinsic Constitution",
+  ];
 
   return (
     <div className={classes.testmanagementpage}>
@@ -32,6 +55,20 @@ function ConstitutionSettingsPage() {
         <div className={classes.sidebarandmaincontent}>
           <Sidebar />
           <div className={classes.maincontent}>
+            <div style={dropdownContainer}>
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                style={dropdown}
+              >
+                <option value="">All Types</option>
+                {constitutionTypes.map((type, index) => (
+                  <option key={index} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
             <table style={tableStyle}>
               <thead>
                 <tr>
@@ -95,6 +132,17 @@ const buttonStyle: React.CSSProperties = {
   padding: "2px 3px", // 调整按钮的大小
   cursor: "pointer",
   borderRadius: "4px", // 添加圆角
+};
+
+const dropdownContainer: React.CSSProperties = {
+  marginBottom: "20px", // 用于分开下拉框和列表
+};
+
+const dropdown: React.CSSProperties = {
+  padding: "8px",
+  fontSize: "16px",
+  borderRadius: "4px",
+  border: "1px solid #ccc",
 };
 
 export default ConstitutionSettingsPage;
