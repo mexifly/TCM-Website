@@ -8,6 +8,8 @@ function ConstitutionSettingsPage() {
   const [items, setItems] = useState([]);
   const [originalItems, setOriginalItems] = useState([]);
   const [selectedType, setSelectedType] = useState("");
+  const [pageSize, setPageSize] = useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetch("http://localhost:3000/constitution_results")
@@ -19,7 +21,7 @@ function ConstitutionSettingsPage() {
       })
       .then((fetchedItems) => {
         setItems(fetchedItems);
-        setOriginalItems(fetchedItems); // 保存原始数据
+        setOriginalItems(fetchedItems);
         console.log(fetchedItems);
       })
       .catch((error) => {
@@ -28,12 +30,16 @@ function ConstitutionSettingsPage() {
   }, []);
 
   useEffect(() => {
-    // 根据选定的类型筛选原始数据
     const filteredItems = selectedType
       ? originalItems.filter((item) => item.consType === selectedType)
       : originalItems;
     setItems(filteredItems);
-  }, [selectedType, originalItems]); // 监听selectedType和originalItems的变化
+  }, [selectedType, originalItems]);
+
+  // 获取当前页展示的数据
+  const indexOfLastItem = currentPage * pageSize;
+  const indexOfFirstItem = indexOfLastItem - pageSize;
+  const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
 
   // 下拉框选项
   const constitutionTypes = [
@@ -48,6 +54,8 @@ function ConstitutionSettingsPage() {
     "Intrinsic Constitution",
   ];
 
+  const totalPages = Math.ceil(items.length / pageSize);
+
   return (
     <div className={classes.testmanagementpage}>
       <Header />
@@ -55,7 +63,11 @@ function ConstitutionSettingsPage() {
         <div className={classes.sidebarandmaincontent}>
           <Sidebar />
           <div className={classes.maincontent}>
+          <span>Constitution Maintenance Content Page</span>
             <div style={dropdownContainer}>
+              <div style={dropdownText}>
+                <span>Filter Constitution Type:</span>
+              </div>
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
@@ -83,7 +95,7 @@ function ConstitutionSettingsPage() {
                 </tr>
               </thead>
               <tbody>
-                {items.map((item) => (
+                {currentItems.map((item) => (
                   <tr key={item.consId}>
                     <td style={tdStyle}>{item.consId}</td>
                     <td style={tdStyle}>{item.consType}</td>
@@ -101,6 +113,42 @@ function ConstitutionSettingsPage() {
                 ))}
               </tbody>
             </table>
+            <div style={paginationContainer}>
+              <div style={paginationButtonContainer}>
+                <button
+                  style={buttonStyle}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                >
+                  Previous
+                </button>
+                <button
+                  style={buttonStyle}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                >
+                  Next
+                </button>
+                <span>{`Page ${currentPage} of ${totalPages}`}</span>
+              </div>
+              <div style={{ ...paginationSelect, ...itemsPerPageLabel }}>
+                <span>Show items per page: </span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setCurrentPage(1); // 重置到第一页
+                    setPageSize(Number(e.target.value));
+                  }}
+                  style={dropdown}
+                >
+                  <option value={3}>3</option>
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -112,6 +160,7 @@ function ConstitutionSettingsPage() {
 const tableStyle: React.CSSProperties = {
   width: "100%",
   borderCollapse: "collapse",
+  marginBottom: "20px",
 };
 
 const thStyle: React.CSSProperties = {
@@ -135,7 +184,13 @@ const buttonStyle: React.CSSProperties = {
 };
 
 const dropdownContainer: React.CSSProperties = {
-  marginBottom: "20px", // 用于分开下拉框和列表
+  display: "flex",
+  alignItems: "center",
+  marginBottom: "40px", // 用于分开下拉框和列表
+};
+
+const dropdownText: React.CSSProperties = {
+  marginRight: "10px", // 文本和下拉框之间的间距
 };
 
 const dropdown: React.CSSProperties = {
@@ -143,6 +198,26 @@ const dropdown: React.CSSProperties = {
   fontSize: "16px",
   borderRadius: "4px",
   border: "1px solid #ccc",
+};
+
+const paginationContainer: React.CSSProperties = {
+  display: "flex",
+  alignItems: "flex-start",
+  justifyContent: "space-between",
+  marginBottom: "20px",
+};
+
+const paginationButtonContainer: React.CSSProperties = {
+  display: "flex",
+  gap: "12px", // 调整按钮之间的间距
+};
+
+const paginationSelect: React.CSSProperties = {
+  marginLeft: "100px", // 控制下拉框与其他元素的间距
+};
+
+const itemsPerPageLabel: React.CSSProperties = {
+  marginRight: "10px", // 控制 "Show items per page" 和下拉框的间距
 };
 
 export default ConstitutionSettingsPage;
