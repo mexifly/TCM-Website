@@ -20,7 +20,7 @@ const App = () => {
           element={<TestManagementPage></TestManagementPage>}
         ></Route>
         <Route
-          path="/modify_question/:questionId"
+          path="/modify_question/:qid"
           element={<ModifyQuestionPage></ModifyQuestionPage>}
         ></Route>
         <Route

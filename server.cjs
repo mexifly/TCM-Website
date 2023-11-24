@@ -47,11 +47,11 @@ app.get("/questions", (req, res) => {
   });
 });
 
-// Get one question by questionId
-app.get("/questions/:questionId", (req, res) => {
-  const questionId = req.params.questionId;
-  const query = "SELECT * FROM questions WHERE questionId = ?";
-  db.query(query, [questionId], (err, results) => {
+// Get one question by qid
+app.get("/questions/:qid", (req, res) => {
+  const qid = req.params.qid;
+  const query = "SELECT * FROM questions WHERE qid = ?";
+  db.query(query, [qid], (err, results) => {
     if (err) {
       console.error("Get question failed:", err);
       res.status(500).json({ error: "Unable to get question" });
@@ -66,16 +66,15 @@ app.get("/questions/:questionId", (req, res) => {
 });
 
 // Update question
-app.put("/questions/:questionId", (req, res) => {
-  const questionId = req.params.questionId;
-  const { questionContent, type } = req.body;
-  const query =
-    "UPDATE questions SET questionContent = ?, type = ? WHERE questionId = ?";
+app.put("/questions/:qid", (req, res) => {
+  const qid = req.params.qid;
+  const { textEn, textCn, type } = req.body;
+  const query = "UPDATE questions SET textEn = ?, textCn = ? WHERE qid = ?";
 
   console.log("Request Body:", req.body);
   console.log("SQL Query:", query);
 
-  db.query(query, [questionContent, type, questionId], (err, result) => {
+  db.query(query, [textEn, textCn, type, qid], (err, result) => {
     if (err) {
       console.error("Update question failed:", err);
       res.status(500).json({ error: "无法更新问题 Unable to update question" });

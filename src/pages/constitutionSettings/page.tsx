@@ -40,6 +40,7 @@ function ConstitutionSettingsPage() {
   const indexOfLastItem = currentPage * pageSize;
   const indexOfFirstItem = indexOfLastItem - pageSize;
   const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+  console.log(currentItems);
 
   // 下拉框选项
   const constitutionTypes = [

@@ -5,11 +5,12 @@ import Sidebar from "../../components/Sidebar";
 import classes from "../ContentPage.module.css";
 
 function TestManagementPage() {
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
   const [currentPage, setCurrentPage] = useState(1);
   const [items, setItems] = useState([]);
   const [pageSize, setPageSize] = useState(itemsPerPage);
   const [selectedType, setSelectedType] = useState("");
+  const [filteredItems, setFilteredItems] = useState([]);
 
   useEffect(() => {
     fetch("http://localhost:3000/questions")
@@ -28,18 +29,33 @@ function TestManagementPage() {
   }, []);
 
   useEffect(() => {
-    const filteredItems = selectedType
+    const filtered = selectedType
       ? items.filter((item) => item.type === selectedType)
       : items;
-    setItems(filteredItems);
+    setFilteredItems(filtered);
     setCurrentPage(1);
   }, [selectedType, items]);
 
-  const indexOfLastItem = currentPage * pageSize;
-  const indexOfFirstItem = indexOfLastItem - pageSize;
+  const indexOfFirstItem = (currentPage - 1) * pageSize;
+  const indexOfLastItem = Math.min(
+    currentPage * pageSize,
+    filteredItems.length
+  );
   const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(items.length / pageSize);
-  const types = Array.from(new Set(items.map((item) => item.type)));
+  const totalPages = Math.ceil(filteredItems.length / pageSize);
+
+  // 下拉框选项
+  const types = [
+    "Neutral Constitution",
+    "Qi Deficient Constitution",
+    "Yang Deficient Constitution",
+    "Yin Deficient Constitution",
+    "Phlegm-Dampness Constitution",
+    "Damp-Heat Constitution",
+    "Blood Stasis Constitution",
+    "Qi-Stagnation Constitution",
+    "Intrinsic Constitution",
+  ];
 
   return (
     <div className={classes.testmanagementpage}>
@@ -69,20 +85,26 @@ function TestManagementPage() {
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th style={thStyle}>ID</th>
-                  <th style={thStyle}>Question</th>
+                  <th style={thStyle}>qid</th>
+                  <th style={thStyle}>groupId</th>
+                  <th style={thStyle}>id</th>
+                  <th style={thStyle}>TextEn</th>
+                  <th style={thStyle}>TextCn</th>
                   <th style={thStyle}>Type</th>
                   <th style={thStyle}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {currentItems.map((item) => (
-                  <tr key={item.questionId}>
-                    <td style={tdStyle}>{item.questionId}</td>
-                    <td style={tdStyle}>{item.questionContent}</td>
+                  <tr key={item.qid}>
+                    <td style={tdStyle}>{item.qid}</td>
+                    <td style={tdStyle}>{item.groupId}</td>
+                    <td style={tdStyle}>{item.id}</td>
+                    <td style={tdStyle}>{item.textEn}</td>
+                    <td style={tdStyle}>{item.textCn}</td>
                     <td style={tdStyle}>{item.type}</td>
                     <td>
-                      <Link to={`/modify_question/${item.questionId}`}>
+                      <Link to={`/modify_question/${item.qid}`}>
                         <button style={buttonStyle}>Modify</button>
                       </Link>
                     </td>
@@ -124,6 +146,7 @@ function TestManagementPage() {
                   <option value={10}>10</option>
                   <option value={20}>20</option>
                   <option value={30}>30</option>
+                  <option value={40}>40</option>
                 </select>
               </div>
             </div>
