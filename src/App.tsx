@@ -13,6 +13,7 @@ import AdminManagement from "./pages/adminInfo/page";
 import ChangePassword from "./pages/password/page";
 import ConstitutionSettingsPage from "./pages/constitutionSettings/page";
 import ModifyConstitutionPage from "./pages/modifyConstitution/page";
+import StatisticsPage from "./pages/statistics/page";
 
 const App = () => {
   return (
@@ -59,6 +60,10 @@ const App = () => {
         <Route
           path="/modify_constitution/:consId"
           element={<ModifyConstitutionPage></ModifyConstitutionPage>}
+        ></Route>
+        <Route
+          path="/pages/statistics"
+          element={<StatisticsPage></StatisticsPage>}
         ></Route>
       </Routes>
     </Router>

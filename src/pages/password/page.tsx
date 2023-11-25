@@ -52,30 +52,77 @@ const ChangePassword = () => {
           <Sidebar />
           <div className={classes.maincontent}>
             <h1 style={{ marginTop: "50px" }}>Change My Password</h1>
-            <input
-              type="password"
-              placeholder="Current Password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              style={{ marginTop: "200px", width: "400px", height: "50px" }}
-            />
-            <input
-              type="password"
-              placeholder="New Password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              style={{ marginTop: "30px", width: "400px", height: "50px" }}
-            />
-            <input
-              type="password"
-              placeholder="Confirm New Password"
-              value={confirmNewPassword}
-              onChange={(e) => setConfirmNewPassword(e.target.value)}
-              style={{ marginTop: "30px", width: "400px", height: "50px" }}
-            />
+            <div style={{ height: "130px" }}></div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "20px",
+              }}
+            >
+              <label
+                htmlFor="currentPassword"
+                style={{ marginRight: "60px", marginLeft: "20px" }}
+              >
+                Current Password
+              </label>
+              <input
+                id="currentPassword"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                style={{ width: "400px", height: "50px" }}
+              />
+            </div>
+            <div style={{ height: "20px" }}></div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "20px",
+              }}
+            >
+              <label
+                htmlFor="newPassword"
+                style={{ marginRight: "72px", marginLeft: "30px" }}
+              >
+                New Password
+              </label>
+              <input
+                id="newPassword"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                style={{ width: "400px", height: "50px" }}
+              />
+            </div>
+            <div style={{ height: "20px" }}></div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "30px",
+              }}
+            >
+              <label
+                htmlFor="confirmNewPassword"
+                style={{ marginRight: "40px" }}
+              >
+                Confirm New Password
+              </label>
+              <input
+                id="confirmNewPassword"
+                type="password"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                style={{ width: "400px", height: "50px" }}
+              />
+            </div>
+            <div style={{ height: "50px" }}></div>
             <button
               onClick={handleChangePassword}
-              style={{ marginTop: "70px", width: "200px", height: "70px" }}
+              style={{ width: "200px", height: "70px" }}
             >
               Change Password
             </button>

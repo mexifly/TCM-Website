@@ -5,6 +5,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const ExcelJS = require('exceljs');
 
 const app = express();
 app.use(express.json());
@@ -346,6 +347,104 @@ app.post('/api/Add_New_Admin', upload.single('adminPhoto'), async (req, res) => 
     }
 });
 
+app.get('/api/respondents', (req, res) => {
+  // Adjust the query as needed
+  const query = 'SELECT * FROM respondents';
+
+  pool.query(query, (err, results) => {
+      if (err) {
+          console.error('Error fetching data from respondents:', err);
+          return res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+      // Send the results back to the client
+      res.json(results);
+  });
+});
+
+// DELETE endpoint to remove a respondent
+app.delete('/api/respondents/:id', (req, res) => {
+  const { id } = req.params;
+
+  const query = 'DELETE FROM respondents WHERE id = ?';
+
+  pool.query(query, [id], (err, result) => {
+      if (err) {
+          console.error('Error deleting respondent:', err);
+          return res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+      if (result.affectedRows === 0) {
+          return res.status(404).json({ error: 'Respondent not found' });
+      }
+
+      res.json({ message: `Respondent with ID ${id} deleted successfully` });
+  });
+});
+
+app.get('/api/responses/:referenceNumber', (req, res) => {
+  const referenceNumber = req.params.referenceNumber;
+
+  const query = `
+    SELECT q.textEn AS question, am.meaning AS answer
+    FROM responses r
+    JOIN respondents resp ON r.respondent_id = resp.id
+    JOIN questions q ON r.question_id = q.qid
+    JOIN answermap am ON r.answer = am.scale
+    WHERE resp.reference_number = ?
+`;
+
+
+  pool.query(query, [referenceNumber], (err, results) => {
+      if (err) {
+          console.error("Error during database query:", err);
+          return res.status(500).send('Server error occurred.');
+      }
+      res.json(results);
+  });
+});
+
+app.get('/api/statistics', (req, res) => {
+  const sql = `
+      SELECT constitution, COUNT(*) as count 
+      FROM respondents 
+      GROUP BY constitution`;
+
+  pool.query(sql, (err, results) => {
+      if (err) {
+          console.error(err);
+          res.status(500).send('Server error');
+          return;
+      }
+      res.json(results);
+  });
+});
+
+app.get('/api/getAccessByDate', (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  // 确保传入了起始和结束日期
+  if (!startDate || !endDate) {
+      return res.status(400).send('Start date and end date are required.');
+  }
+
+  // SQL 查询，根据日期分组并计算每组的记录数
+  const sql = `
+      SELECT DATE_FORMAT(timestamp, '%Y-%m-%d') as date, COUNT(*) as count
+      FROM respondents
+      WHERE timestamp BETWEEN ? AND ?
+      GROUP BY DATE_FORMAT(timestamp, '%Y-%m-%d')
+      ORDER BY date`;
+
+  pool.query(sql, [startDate, endDate], (err, results) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).send('Server error');
+      }
+      res.json(results);
+  });
+});
+
 
 // Get all questions
 app.get("/questions", (req, res) => {
@@ -474,6 +573,34 @@ app.get("/questions", (req, res) => {
     );
   });
 
+  app.get('/api/downloadRespondents', async (req, res) => {
+    try {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Respondents');
+
+        // Define columns
+        worksheet.columns = [
+            { header: 'ID', key: 'id', width: 10 },
+            { header: 'Reference Number', key: 'reference_number', width: 30 },
+            { header: 'Timestamp', key: 'timestamp', width: 30 },
+            { header: 'Constitution', key: 'constitution', width: 30 },
+        ];
+
+        // Query your database to get the data
+        const data = await pool.promise().query('SELECT * FROM respondents');
+        worksheet.addRows(data[0]);
+
+        // Set headers to download the file
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=respondents.xlsx`);
+
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (error) {
+        console.error('Error creating Excel file:', error);
+        res.status(500).send('Error creating Excel file');
+    }
+});
 
 app.listen(3000, () => {
     console.log('Listening on port 3000...');
