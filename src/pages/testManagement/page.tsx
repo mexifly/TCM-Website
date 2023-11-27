@@ -5,7 +5,7 @@ import Sidebar from "../../components/Sidebar";
 import classes from "../ContentPage.module.css";
 
 function TestManagementPage() {
-  const itemsPerPage = 15;
+  const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [items, setItems] = useState([]);
   const [pageSize, setPageSize] = useState(itemsPerPage);
@@ -41,7 +41,7 @@ function TestManagementPage() {
     currentPage * pageSize,
     filteredItems.length
   );
-  const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredItems.length / pageSize);
 
   // 下拉框选项
