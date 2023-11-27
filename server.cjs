@@ -74,7 +74,7 @@ app.put("/questions/:qid", (req, res) => {
   console.log("Request Body:", req.body);
   console.log("SQL Query:", query);
 
-  db.query(query, [textEn, textCn, type, qid], (err, result) => {
+  db.query(query, [textEn, textCn, qid], (err, result) => {
     if (err) {
       console.error("Update question failed:", err);
       res.status(500).json({ error: "无法更新问题 Unable to update question" });
@@ -132,11 +132,11 @@ app.put("/constitution_results/:consId", (req, res) => {
     cause,
     vigilant,
     improvement,
-    recommondRecipe,
+    recommendRecipe,
   } = req.body;
 
   const query =
-    "UPDATE constitution_results SET consType = ?, definition = ?, disturbance = ?, cause = ?, vigilant = ?, improvement = ?, recommondRecipe = ? WHERE consId = ?";
+    "UPDATE constitution_results SET consType = ?, definition = ?, disturbance = ?, cause = ?, vigilant = ?, improvement = ?, recommendRecipe = ? WHERE consId = ?";
   db.query(
     query,
     [
@@ -146,7 +146,7 @@ app.put("/constitution_results/:consId", (req, res) => {
       cause,
       vigilant,
       improvement,
-      recommondRecipe,
+      recommendRecipe,
       consId,
     ],
     (err, result) => {
