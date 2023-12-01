@@ -26,7 +26,7 @@ const Login: React.FC = () => {
       if (user) {
         localStorage.setItem("user", JSON.stringify(user));
 
-        navigate("/main");
+        navigate("/pages/testManagement");
       } else {
         alert("Invalid login credentials.");
       }
