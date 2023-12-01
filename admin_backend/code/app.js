@@ -28,9 +28,9 @@ const upload = multer({ storage: storage });
 // Create a connection pool instead of a single connection
 const pool = mysql.createPool({
   host: 'localhost',
-  user: 'root',
-  password: 'qweasdzxc',
-  database: 'admin'
+  user: 'rachel',
+  password: '940326',
+  database: 'tcm_admin'
 });
 
 
