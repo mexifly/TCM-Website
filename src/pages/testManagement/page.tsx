@@ -64,7 +64,10 @@ function TestManagementPage() {
         <div className={classes.sidebarandmaincontent}>
           <Sidebar />
           <div className={classes.maincontent}>
-            <span>Question Maintenance Content Page</span>
+            <span style={{ fontSize: "30px", fontWeight: "bold" }}>
+              Question Maintenance Content Page
+            </span>
+
             <div style={dropdownContainer}>
               <div style={dropdownText}>
                 <span>Filter Constitution Type:</span>
