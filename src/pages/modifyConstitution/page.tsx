@@ -50,29 +50,23 @@ function ModifyConstitutionPage() {
     setModifiedData({ ...modifiedData, consType: e.target.value });
   };
 
-  const handleDefinitionChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  const handleDefinitionChange = (e) => {
     setModifiedData({ ...modifiedData, definition: e.target.value });
   };
 
-  const handleDisturbanceChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  const handleDisturbanceChange = (e) => {
     setModifiedData({ ...modifiedData, disturbance: e.target.value });
   };
 
-  const handleCauseChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleCauseChange = (e) => {
     setModifiedData({ ...modifiedData, cause: e.target.value });
   };
 
-  const handleVigilantChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleVigilantChange = (e) => {
     setModifiedData({ ...modifiedData, vigilant: e.target.value });
   };
 
-  const handleImprovementChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  const handleImprovementChange = (e) => {
     setModifiedData({ ...modifiedData, improvement: e.target.value });
   };
 

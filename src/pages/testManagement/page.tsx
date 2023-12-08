@@ -1,37 +1,70 @@
-import React, { useState, useEffect } from "react";
-import { Link, Route, useParams } from "react-router-dom";
+import React, { useState, useEffect, CSSProperties } from "react";
+import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import classes from "../ContentPage.module.css";
 
+interface Item {
+  qid: number;
+  groupId: number;
+  id: number;
+  textEn: string;
+  textCn: string;
+  type: string;
+  // ... any other properties that items might have
+}
 function TestManagementPage() {
-  const itemsPerPage = 10; // 每页显示的数据行数
+  const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
-  const [items, setItems] = useState([]);
-  // 使用 useEffect 来触发数据加载
+  const [items, setItems] = useState<Item[]>([]);
+  const [pageSize, setPageSize] = useState(itemsPerPage);
+  const [selectedType, setSelectedType] = useState("");
+  const [filteredItems, setFilteredItems] = useState<Item[]>([]);
+
   useEffect(() => {
-    // 使用fetch来获取数据
     fetch("http://localhost:3000/questions")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        return response.json(); // 解析JSON响应
+        return response.json();
       })
-      .then((items) => {
-        // 更新items状态以触发重新渲染
-        setItems(items);
-        console.log(items);
+      .then((data) => {
+        setItems(data);
       })
       .catch((error) => {
         console.error("There was a problem with the fetch operation:", error);
       });
-  }, []); // 空数组表示仅在组件加载时运行
+  }, []);
 
-  const handleModify = (questionId: number) => {
-    // TODO 修改操作
-    console.log(`Modify item with ID: ${questionId}`);
-  };
+  useEffect(() => {
+    const filtered = selectedType
+      ? items.filter((item) => item.type === selectedType)
+      : items;
+    setFilteredItems(filtered);
+    setCurrentPage(1);
+  }, [selectedType, items]);
+
+  const indexOfFirstItem = (currentPage - 1) * pageSize;
+  const indexOfLastItem = Math.min(
+    currentPage * pageSize,
+    filteredItems.length
+  );
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredItems.length / pageSize);
+
+  // 下拉框选项
+  const types = [
+    "Neutral Constitution",
+    "Qi Deficient Constitution",
+    "Yang Deficient Constitution",
+    "Yin Deficient Constitution",
+    "Phlegm-Dampness Constitution",
+    "Damp-Heat Constitution",
+    "Blood Stasis Constitution",
+    "Qi-Stagnation Constitution",
+    "Intrinsic Constitution",
+  ];
 
   return (
     <div className={classes.testmanagementpage}>
@@ -40,23 +73,50 @@ function TestManagementPage() {
         <div className={classes.sidebarandmaincontent}>
           <Sidebar />
           <div className={classes.maincontent}>
+            <span style={{ fontSize: "30px", fontWeight: "bold" }}>
+              Question Maintenance Content Page
+            </span>
+
+            <div style={dropdownContainer}>
+              <div style={dropdownText}>
+                <span>Filter Constitution Type:</span>
+              </div>
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                style={dropdown}
+              >
+                <option value="">All Types</option>
+                {types.map((type, index) => (
+                  <option key={index} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th style={thStyle}>ID</th>
-                  <th style={thStyle}>Question</th>
+                  <th style={thStyle}>qid</th>
+                  <th style={thStyle}>groupId</th>
+                  <th style={thStyle}>id</th>
+                  <th style={thStyle}>TextEn</th>
+                  <th style={thStyle}>TextCn</th>
                   <th style={thStyle}>Type</th>
                   <th style={thStyle}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {items.map((item) => (
-                  <tr key={item.questionId}>
-                    <td style={tdStyle}>{item.questionId}</td>
-                    <td style={tdStyle}>{item.questionContent}</td>
+                {currentItems.map((item) => (
+                  <tr key={item.qid}>
+                    <td style={tdStyle}>{item.qid}</td>
+                    <td style={tdStyle}>{item.groupId}</td>
+                    <td style={tdStyle}>{item.id}</td>
+                    <td style={tdStyle}>{item.textEn}</td>
+                    <td style={tdStyle}>{item.textCn}</td>
                     <td style={tdStyle}>{item.type}</td>
                     <td>
-                      <Link to={`/modify_question/${item.questionId}`}>
+                      <Link to={`/modify_question/${item.qid}`}>
                         <button style={buttonStyle}>Modify</button>
                       </Link>
                     </td>
@@ -64,6 +124,44 @@ function TestManagementPage() {
                 ))}
               </tbody>
             </table>
+            <div style={paginationContainer}>
+              <div style={paginationButtonContainer}>
+                <button
+                  style={buttonStyle}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                >
+                  Previous
+                </button>
+                <button
+                  style={buttonStyle}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                >
+                  Next
+                </button>
+                <span>{`Page ${currentPage} of ${totalPages}`}</span>
+              </div>
+              <div style={{ ...paginationSelect, ...itemsPerPageLabel }}>
+                <span>Show items per page: </span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setCurrentPage(1);
+                    setPageSize(Number(e.target.value));
+                  }}
+                  style={dropdown}
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={30}>30</option>
+                  <option value={40}>40</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -71,34 +169,67 @@ function TestManagementPage() {
   );
 }
 
-// 定义内联样式 Define inline style
-const tableStyle: React.CSSProperties = {
+const tableStyle: CSSProperties = {
   width: "100%",
   borderCollapse: "collapse",
+  marginBottom: "20px",
 };
 
-const thStyle: React.CSSProperties = {
+const thStyle: CSSProperties = {
   backgroundColor: "#f2f2f2",
   textAlign: "left",
   padding: "10px",
 };
 
-const tdStyle: React.CSSProperties = {
+const tdStyle: CSSProperties = {
   border: "1px solid #ddd",
   padding: "10px",
 };
 
-const buttonStyle: React.CSSProperties = {
+const dropdownContainer: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  marginBottom: "20px",
+};
+
+const dropdownText: CSSProperties = {
+  marginRight: "10px",
+};
+
+const dropdown: CSSProperties = {
+  padding: "8px",
+  fontSize: "16px",
+  borderRadius: "4px",
+  border: "1px solid #ccc",
+};
+
+const paginationContainer: CSSProperties = {
+  display: "flex",
+  alignItems: "flex-start",
+  justifyContent: "space-between",
+  marginBottom: "20px",
+};
+
+const paginationButtonContainer: CSSProperties = {
+  display: "flex",
+  gap: "12px",
+};
+
+const buttonStyle: CSSProperties = {
   backgroundColor: "#3498db",
   color: "#fff",
   border: "none",
-  padding: "2px 3px", // 调整按钮的大小
+  padding: "2px 3px",
   cursor: "pointer",
-  borderRadius: "4px", // 添加圆角
+  borderRadius: "4px",
 };
 
-const buttonHoverStyle: React.CSSProperties = {
-  backgroundColor: "#2980b9",
+const paginationSelect: CSSProperties = {
+  marginLeft: "100px",
+};
+
+const itemsPerPageLabel: CSSProperties = {
+  marginRight: "10px",
 };
 
 export default TestManagementPage;

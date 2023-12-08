@@ -12,8 +12,9 @@ import axios from "axios";
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showNotification, setShowNotification] = useState(false);
   const navigate = useNavigate();
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -21,17 +22,20 @@ const Login: React.FC = () => {
         email: email,
         password: password,
       });
-      const user = response.data;
+      const data = response.data;
 
-      if (user) {
-        localStorage.setItem("user", JSON.stringify(user));
+      if (data.token) {
+        localStorage.setItem("token", data.token); // 保存 token
+        setShowNotification(true);
 
-        navigate("/pages/testManagement");
+        // 延时1秒后跳转
+        setTimeout(() => {
+          navigate("/pages/testManagement");
+        }, 1000);
       } else {
         alert("Invalid login credentials.");
       }
     } catch (error) {
-      // Handle the error based on the error response from your backend
       console.error("Login error:", error);
       alert("Login failed. Please try again.");
     }
@@ -39,6 +43,11 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-page">
+      {showNotification && (
+        <div className="login-notification">
+          Successfully Login! <i className="icon-checkmark"></i>
+        </div>
+      )}
       <div className="login-box">
         <h1 className="headline">Administrator System</h1>
         <form onSubmit={handleLogin}>

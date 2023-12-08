@@ -16,30 +16,28 @@ const AdminManagement = () => {
   });
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    // Fetch admin data and current photo
-    const adminId = user.user.adminId;
-    if (adminId) {
-      axios
-        .get(`http://localhost:3000/api/admin/${adminId}/info`) // Assuming a route to fetch admin info by ID
-        .then((response) => {
-          console.log(response.data);
-          setAdminData(response.data);
-          // Fetch photo
-          axios
-            .get(`http://localhost:3000/api/admin/${adminId}/photo`)
-            .then((photoResponse) => {
-              setAdminData((prevState) => ({
-                ...prevState,
-                photo: photoResponse.data.photoUrl,
-              }));
-            })
-            .catch((photoError) =>
-              console.error("Error fetching photo:", photoError)
-            );
-        })
-        .catch((error) => console.error("Error fetching admin data:", error));
-    }
+    const fetchAdminInfo = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const response = await axios.get("http://localhost:3000/getUserInfo", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setAdminData({
+          ...response.data,
+          adminId: response.data.adminId, // 保证adminId是正确的
+          photo: response.data.avatar, // 假设avatar字段现在存储图片URL
+        });
+      } catch (error) {
+        console.error("Error fetching admin data:", error);
+        // 可能的错误处理
+      }
+    };
+
+    fetchAdminInfo();
   }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,9 +45,8 @@ const AdminManagement = () => {
   };
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
     // Fetch admin data and current photo
-    const adminId = user.user.adminId;
+    const adminId = adminData.adminId;
     if (!adminId) {
       alert("Admin ID is missing.");
       return;
@@ -64,12 +61,6 @@ const AdminManagement = () => {
       axios
         .post("http://localhost:3000/uploadAdminPhoto", formData)
         .then((response) => {
-          let storedData = JSON.parse(localStorage.getItem("user") || "{}");
-          let updatedUser = storedData.user ? { ...storedData.user } : {};
-
-          updatedUser.avatar = response.data.filePath; // 更新头像 URL
-
-          localStorage.setItem("user", JSON.stringify({ user: updatedUser }));
           setAdminData((prevState) => ({
             ...prevState,
             photo: response.data.filePath,
@@ -109,7 +100,7 @@ const AdminManagement = () => {
           >
             <div style={{ marginLeft: "660px" }}>
               <div style={{ height: "60px" }}></div>
-              <h2>Personal Information</h2>
+              <h2 style={{ fontWeight: "bold" }}>Personal Information</h2>
               <div style={{ height: "20px" }}></div>
               <div>
                 {adminData.photo && (
@@ -123,7 +114,7 @@ const AdminManagement = () => {
               <input type="file" onChange={handlePhotoUpload} />
               <div style={{ height: "30px" }}></div>
               <form onSubmit={handleSubmit} style={{ textAlign: "center" }}>
-                <label style={{ marginRight: "25px" }}>
+                <label style={{ marginRight: "25px", fontWeight: "bold" }}>
                   Admin First Name:
                   <input
                     type="text"
@@ -131,12 +122,12 @@ const AdminManagement = () => {
                     value={adminData.adminFirstName}
                     onChange={handleChange}
                     required
-                    style={{ marginLeft: "5px" }}
+                    style={{ marginLeft: "5px", color: "blue" }}
                   />
                 </label>
 
                 <div style={{ height: "30px" }}></div>
-                <label style={{ marginRight: "25px" }}>
+                <label style={{ marginRight: "25px", fontWeight: "bold" }}>
                   Admin Last Name:
                   <input
                     type="text"
@@ -144,12 +135,12 @@ const AdminManagement = () => {
                     value={adminData.adminLastName}
                     onChange={handleChange}
                     required
-                    style={{ marginLeft: "5px" }}
+                    style={{ marginLeft: "5px", color: "blue" }}
                   />
                 </label>
 
                 <div style={{ height: "30px" }}></div>
-                <label style={{ marginRight: "23px" }}>
+                <label style={{ marginRight: "23px", fontWeight: "bold" }}>
                   Admin Email:
                   <input
                     type="email"
@@ -157,12 +148,12 @@ const AdminManagement = () => {
                     value={adminData.adminEmail}
                     onChange={handleChange}
                     required
-                    style={{ marginLeft: "40px" }}
+                    style={{ marginLeft: "40px", color: "blue" }}
                   />
                 </label>
                 <div style={{ height: "30px" }}></div>
 
-                <label style={{ marginRight: "20px" }}>
+                <label style={{ marginRight: "20px", fontWeight: "bold" }}>
                   Admin Address:
                   <input
                     type="text"
@@ -170,12 +161,12 @@ const AdminManagement = () => {
                     value={adminData.adminAddress}
                     onChange={handleChange}
                     required
-                    style={{ marginLeft: "20px" }}
+                    style={{ marginLeft: "20px", color: "blue" }}
                   />
                 </label>
                 <div style={{ height: "30px" }}></div>
 
-                <label style={{ marginRight: "15px" }}>
+                <label style={{ marginRight: "20px", fontWeight: "bold" }}>
                   Phone Number:
                   <input
                     type="text"
@@ -183,7 +174,7 @@ const AdminManagement = () => {
                     value={adminData.adminPhoneNumber}
                     onChange={handleChange}
                     required
-                    style={{ marginLeft: "20px" }}
+                    style={{ marginLeft: "20px", color: "blue" }}
                   />
                 </label>
                 <div style={{ height: "30px" }}></div>

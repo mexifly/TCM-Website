@@ -4,6 +4,7 @@ import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import classes from "../ContentPage.module.css";
 import { Doughnut, Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import {
   Chart,
   ArcElement,
@@ -13,6 +14,9 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
+  Title,
+  BarController,
 } from "chart.js";
 Chart.register(
   ArcElement,
@@ -21,8 +25,20 @@ Chart.register(
   CategoryScale,
   LinearScale,
   PointElement,
-  LineElement
+  LineElement,
+  BarElement,
+  Title,
+  BarController
 );
+
+interface Question {
+  qid: number;
+  groupId: number;
+  id: number;
+  textEn: string;
+  textCn: string;
+  type: string;
+}
 
 interface ConstitutionStat {
   constitution: string;
@@ -73,6 +89,15 @@ interface DataPoint {
   count: number;
 }
 function StatisticsPage() {
+  const [questionOptions, setQuestionOptions] = useState<Question[]>([]);
+  const [selectedQuestions, setSelectedQuestions] = useState<(number | null)[]>(
+    [null, null, null]
+  );
+  const [histogramData, setHistogramData] = useState<ChartData>({
+    labels: [],
+    datasets: [],
+  });
+
   const [chartData, setChartData] = useState<ChartData>({
     labels: [],
     datasets: [
@@ -84,9 +109,54 @@ function StatisticsPage() {
     ],
   });
 
+  const tooltipOptions = {
+    plugins: {
+      tooltip: {
+        bodyFontSize: 160, // 主体文字大小
+        titleFontSize: 180, // 标题文字大小
+        footerFontSize: 160, // 脚注文字大小
+
+        // 调整 tooltip 框的内边距
+        padding: {
+          top: 50,
+          right: 50,
+          bottom: 50,
+          left: 50,
+        },
+
+        // 自定义样式（如有必要）
+        backgroundColor: "#FFF", // 背景颜色
+        titleColor: "#000", // 标题颜色
+        bodyColor: "#000", // 主体文字颜色
+        footerColor: "#000", // 脚注文字颜色
+        borderColor: "#DDD", // 边框颜色
+        borderWidth: 1, // 边框宽度
+        callbacks: {
+          label: function (context: any) {
+            const labelIndex = context.dataIndex;
+            const datasetIndex = context.datasetIndex;
+            const data = context.chart.data;
+
+            const dataset = data.datasets[datasetIndex];
+            const total = dataset.data.reduce(
+              (sum: number, value: number) => sum + value,
+              0
+            );
+            const currentValue = dataset.data[labelIndex];
+            const percentage = ((currentValue / total) * 100).toFixed(2);
+            const label = data.labels[labelIndex] || "";
+
+            return `${label}: ${currentValue} (${percentage}%)`;
+          },
+        },
+      },
+    },
+  };
+
   const [activeButton, setActiveButton] = useState<number>(1); // 新增状态
 
   useEffect(() => {
+    fetchQuestions();
     axios
       .get<ConstitutionStat[]>("http://localhost:3000/api/statistics")
       .then((response) => {
@@ -180,7 +250,7 @@ function StatisticsPage() {
     setActiveButton(buttonNumber);
   };
 
-  const buttonNames = ["Proportion", "Traffic", "3", "4"];
+  const buttonNames = ["Proportion", "Traffic", "Histogram"];
 
   const handleRefreshClick = () => {
     // 重置时间选择器状态
@@ -194,6 +264,54 @@ function StatisticsPage() {
     });
   };
 
+  const fetchQuestions = () => {
+    axios
+      .get("http://localhost:3000/api/Retrivequestions")
+      .then((response) => {
+        if (response.data && Array.isArray(response.data.questions)) {
+          setQuestionOptions(response.data.questions);
+        } else {
+          console.error("Invalid response format:", response.data);
+        }
+      })
+      .catch((error) => console.error("Error fetching questions: ", error));
+  };
+
+  // 处理问题选择的变化
+  const handleQuestionSelect = (index: number, questionId: number) => {
+    const newSelection = [...selectedQuestions];
+    newSelection[index] = questionId;
+    setSelectedQuestions(newSelection);
+  };
+
+  function handleRefreshHistogram() {
+    // 重置问题选择器状态
+    setSelectedQuestions([null, null, null]);
+
+    // 重置直方图数据
+    setHistogramData({
+      labels: [],
+      datasets: [],
+    });
+  }
+
+  const fetchHistogramData = () => {
+    axios
+      .post("http://localhost:3000/api/histogram", {
+        questions: selectedQuestions.filter((q) => q),
+      })
+      .then((response) => {
+        // 假设后端返回的数据结构为 { datasets: [...] }
+        setHistogramData({
+          labels: ["No", "Seldom", "Sometimes", "Often", "Always"],
+          datasets: response.data.datasets,
+        });
+      })
+      .catch((error) =>
+        console.error("Error fetching histogram data: ", error)
+      );
+  };
+
   const renderContent = () => {
     switch (activeButton) {
       case 1:
@@ -205,14 +323,14 @@ function StatisticsPage() {
               marginTop: "100px",
             }}
           >
-            <Doughnut data={chartData} />
+            <Doughnut data={chartData} options={tooltipOptions} />
           </div>
         );
       case 2:
         return (
           <div>
             <div style={{ marginTop: "40px" }}>
-              <label style={{ marginLeft: "165px" }}>Select start time: </label>
+              <label style={{ marginLeft: "250px" }}>Select start time: </label>
               <input
                 type="date"
                 value={startDate}
@@ -231,7 +349,7 @@ function StatisticsPage() {
                   display: "flex",
                   alignItems: "center",
                   marginTop: "40px",
-                  marginLeft: "350px",
+                  marginLeft: "450px",
                 }}
               >
                 {/* Filter按钮 */}
@@ -270,8 +388,8 @@ function StatisticsPage() {
 
               <div
                 style={{
-                  width: "900px", // 宽度值
-                  height: "600px", // 高度值
+                  width: "1100px", // 宽度值
+                  height: "800px", // 高度值
                   marginTop: "40px",
                 }}
               >
@@ -286,9 +404,62 @@ function StatisticsPage() {
           </div>
         );
       case 3:
-        return <div> 3</div>;
-      case 4:
-        return <div>4</div>;
+        return (
+          <div>
+            <div>
+              {selectedQuestions.map((_, index: number) => (
+                <select
+                  style={{
+                    marginBottom: "5px",
+                    width: "400px",
+                    marginRight: "30px",
+                    marginTop: "20px",
+                  }}
+                  key={index}
+                  value={selectedQuestions[index] || ""}
+                  onChange={(e) =>
+                    handleQuestionSelect(index, parseInt(e.target.value))
+                  }
+                >
+                  <option value="">Select a question</option>
+                  {questionOptions.map((question: Question) => (
+                    <option key={question.qid} value={question.qid}>
+                      {question.textEn}
+                    </option>
+                  ))}
+                </select>
+              ))}
+              <button
+                style={{ width: "100px", backgroundColor: "red" }}
+                onClick={fetchHistogramData}
+              >
+                Compare
+              </button>
+              <button
+                onClick={handleRefreshHistogram}
+                style={{
+                  width: "100px",
+                  backgroundColor: "green",
+                  marginLeft: "20px",
+                }}
+              >
+                Refresh
+              </button>
+            </div>
+            <div
+              style={{
+                width: "1300px", // 宽度值
+                height: "800px", // 高度值
+                marginTop: "40px",
+                marginLeft: "50px",
+              }}
+            >
+              {Object.keys(histogramData).length > 0 && (
+                <Bar data={histogramData} />
+              )}
+            </div>
+          </div>
+        );
       default:
         return null;
     }

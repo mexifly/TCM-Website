@@ -14,6 +14,7 @@ import ChangePassword from "./pages/password/page";
 import ConstitutionSettingsPage from "./pages/constitutionSettings/page";
 import ModifyConstitutionPage from "./pages/modifyConstitution/page";
 import StatisticsPage from "./pages/statistics/page";
+import "../src/components/axiosSetup";
 
 const App = () => {
   return (
@@ -26,7 +27,7 @@ const App = () => {
           element={<TestManagementPage></TestManagementPage>}
         ></Route>
         <Route
-          path="/modify_question/:questionId"
+          path="/modify_question/:qid"
           element={<ModifyQuestionPage></ModifyQuestionPage>}
         ></Route>
         <Route

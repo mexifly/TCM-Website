@@ -1,16 +1,29 @@
 import React, { useState, useEffect } from "react";
 import styles from "./Header.module.css";
-import { Link } from "react-router-dom";
+import axios from "axios"; // 确保已经导入 axios
+import { Link, useNavigate } from "react-router-dom";
+
+interface AdminInfo {
+  adminId: number;
+  adminFirstName: string | null | undefined;
+  adminLastName: string | null | undefined;
+  adminEmail: string;
+  adminAddress: string | null | undefined;
+  adminPhoneNumber: string | null | undefined;
+  avatar: string | undefined;
+}
 
 function Header() {
+  const navigate = useNavigate();
   // 设置下拉菜单的状态
   const [dropdownOpen, setDropdownOpen] = useState(false);
   // 设置用户信息的状态
-  const [user, setUser] = useState(() => {
-    const storedData = JSON.parse(localStorage.getItem("user") || "{}");
-    return storedData.user || {};
-  });
+  const [user, setUser] = useState<AdminInfo>({} as AdminInfo);
 
+  const handleExit = () => {
+    localStorage.removeItem("token");
+    navigate("/"); // 重定向到登录页面（根据您的路由路径调整）
+  };
   // 切换下拉菜单的显示与隐藏
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -25,15 +38,38 @@ function Header() {
     : styles["dropdown-icon"]; // 默认类
 
   useEffect(() => {
-    const handleStorageChange = () => {
-      const storedData = JSON.parse(localStorage.getItem("user") || "{}");
-      setUser(storedData.user || {});
+    let isMounted = true;
+    const fetchUserInfo = async () => {
+      const token = localStorage.getItem("token");
+      const cachedUser = localStorage.getItem("cachedUser");
+
+      if (cachedUser) {
+        setUser(JSON.parse(cachedUser));
+        return;
+      }
+
+      if (!token) return;
+
+      try {
+        const response = await axios.get("http://localhost:3000/getUserInfo", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (isMounted) {
+          setUser(response.data);
+          localStorage.setItem("cachedUser", JSON.stringify(response.data));
+        }
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+        // 错误处理逻辑...
+      }
     };
 
-    window.addEventListener("storage", handleStorageChange);
-
+    fetchUserInfo();
     return () => {
-      window.removeEventListener("storage", handleStorageChange);
+      isMounted = false;
     };
   }, []);
 
@@ -55,9 +91,7 @@ function Header() {
             <Link to="/pages/password">
               <button>Change Password</button>
             </Link>
-            <Link to="/">
-              <button>Exit</button>
-            </Link>
+            <button onClick={handleExit}>Exit</button>
           </div>
         </div>
       </div>
@@ -65,4 +99,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default React.memo(Header);

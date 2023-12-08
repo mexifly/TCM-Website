@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import classes from "../ContentPage.module.css";
+import axios from "axios";
 
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -15,32 +16,39 @@ const ChangePassword = () => {
       return;
     }
 
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const adminId = user.user.adminId;
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("You are not logged in.");
+      return;
+    }
 
-    const response = await fetch("http://localhost:3000/api/change-password", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        adminId,
-        currentPassword,
-        newPassword,
-      }),
-    });
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/change-password",
+        {
+          currentPassword,
+          newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    const data = await response.json();
-    if (response.ok) {
-      alert("Password changed successfully. Please Login again");
-
-      // 清除localStorage中的user信息
-      localStorage.removeItem("user");
-
-      // 重定向到根路径
-      window.location.href = "/";
-    } else {
-      alert(`Error: ${data.error}`);
+      if (response.status === 200) {
+        // 密码更改成功
+        localStorage.removeItem("token"); // 清除 token
+        alert("Password changed successfully! Please login again.");
+        window.location.href = "/";
+      } else {
+        // 其他情况，例如401或403错误
+        alert("Failed to change password. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error changing password:", error);
+      alert("Error changing password. Please try again.");
     }
   };
 
@@ -51,7 +59,9 @@ const ChangePassword = () => {
         <div className={classes.sidebarandmaincontent}>
           <Sidebar />
           <div className={classes.maincontent}>
-            <h1 style={{ marginTop: "50px" }}>Change My Password</h1>
+            <h1 style={{ marginTop: "50px", fontWeight: "bold" }}>
+              Change My Password
+            </h1>
             <div style={{ height: "130px" }}></div>
             <div
               style={{

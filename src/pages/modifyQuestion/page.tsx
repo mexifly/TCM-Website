@@ -7,13 +7,17 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function ModifyQuestionPage() {
-  const { questionId } = useParams();
+  const { qid } = useParams();
   const [questionData, setQuestionData] = useState({});
-  const [modifiedData, setModifiedData] = useState({ type: "", text: "" });
+  const [modifiedData, setModifiedData] = useState({
+    type: "",
+    textEn: "",
+    textCn: "",
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://localhost:3000/questions/${questionId}`)
+    fetch(`http://localhost:3000/questions/${qid}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -22,28 +26,33 @@ function ModifyQuestionPage() {
       })
       .then((data) => {
         setQuestionData(data);
-        setModifiedData({ type: data.type, text: data.questionContent });
+        setModifiedData({
+          textEn: data.textEn,
+          textCn: data.textCn,
+          type: data.type,
+        });
       })
       .catch((error) => {
         console.error("There was a problem with the fetch operation:", error);
       });
-  }, [questionId]);
+  }, [qid]);
 
-  const handleTypeChange = (e: { target: { value: any } }) => {
-    setModifiedData({ ...modifiedData, type: e.target.value });
+  const handleTextEnChange = (e: { target: { value: any } }) => {
+    setModifiedData({ ...modifiedData, textEn: e.target.value });
   };
 
-  const handleTextChange = (e: { target: { value: any } }) => {
-    setModifiedData({ ...modifiedData, text: e.target.value });
+  const handleTextCnChange = (e: { target: { value: any } }) => {
+    setModifiedData({ ...modifiedData, textCn: e.target.value });
   };
 
   const handleSave = () => {
     const dataToSend = {
       type: modifiedData.type,
-      questionContent: modifiedData.text,
+      textEn: modifiedData.textEn,
+      textCn: modifiedData.textCn,
     };
 
-    fetch(`http://localhost:3000/questions/${questionId}`, {
+    fetch(`http://localhost:3000/questions/${qid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -76,23 +85,26 @@ function ModifyQuestionPage() {
             <Sidebar />
             <div className={classes.maincontent}>
               <h1 className={classes.heading}>
-                Modify Question Information - ID: {questionId}
+                Modify Question Information - QID: {qid}
               </h1>
               <div className={classes.formGroup}>
                 <label className={classes.label}>Constitution Type:</label>
-                <input
-                  type="text"
-                  className={classes.input}
-                  value={modifiedData.type}
-                  onChange={handleTypeChange}
+                <div className={classes.input}>{modifiedData.type}</div>
+              </div>
+              <div className={classes.formGroup}>
+                <label className={classes.label}>TextEn:</label>
+                <textarea
+                  className={classes.textarea}
+                  value={modifiedData.textEn}
+                  onChange={handleTextEnChange}
                 />
               </div>
               <div className={classes.formGroup}>
-                <label className={classes.label}>Question Content:</label>
+                <label className={classes.label}>TextCn:</label>
                 <textarea
                   className={classes.textarea}
-                  value={modifiedData.text}
-                  onChange={handleTextChange}
+                  value={modifiedData.textCn}
+                  onChange={handleTextCnChange}
                 />
               </div>
               <div className={classes.buttonGroup}>

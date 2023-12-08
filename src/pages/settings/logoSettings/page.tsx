@@ -67,9 +67,10 @@ function LogoSettingsPage() {
                 fontSize: "3em",
                 fontFamily: "sans-serif",
                 marginLeft: "500px",
+                fontWeight: "bold",
               }}
             >
-              Setting New Website Logo
+              Set New Website Logo
             </div>
             <div
               style={{

@@ -72,3 +72,33 @@ button:hover {
   margin-bottom: 1.5em;
 }
 
+.login-notification {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgb(10, 223, 28);
+  color: white; /* 设置字体颜色为白色 */
+  padding: 10px;
+  border-radius: 5px;
+  animation: fadeOut 2s forwards;
+  font-size: larger; /* 增加字体大小 */
+  font-weight: bold; /* 加粗字体 */
+  display: flex; /* 使用Flexbox布局 */
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  width: 200px; /* 假设原来是100px */
+  height: 100px;
+}
+
+
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+

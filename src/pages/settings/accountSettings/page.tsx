@@ -26,6 +26,7 @@ interface NewAdminState {
   adminPhoto: File | null; // Allow both File and null types
 }
 function AccountSettingsPage() {
+  const [isLoading, setIsLoading] = useState(false);
   const [items, setItems] = useState<AdminItem[]>([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [newAdmin, setNewAdmin] = useState<NewAdminState>({
@@ -45,12 +46,21 @@ function AccountSettingsPage() {
   }, []);
 
   const fetchData = async () => {
+    setIsLoading(true);
+    const minLoadingTime = 500; // 最小加载时间为 1000 毫秒 (1 秒)
+    const startTime = Date.now();
+
     try {
-      const response = await fetch("http://localhost:3000/api/admins"); // Adjust the API endpoint as needed
-      const data = await response.json();
-      setItems(data);
+      const response = await axios.get("http://localhost:3000/api/admins");
+      setItems(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      const endTime = Date.now();
+      const loadingTime = endTime - startTime;
+      setTimeout(() => {
+        setIsLoading(false); // 结束加载
+      }, Math.max(minLoadingTime - loadingTime, 0)); // 确保至少展示1秒的加载时间
     }
   };
 
@@ -61,19 +71,14 @@ function AccountSettingsPage() {
       )
     ) {
       try {
-        const response = await fetch(
-          `http://localhost:3000/deleteAdmin/${adminId}`,
-          {
-            method: "DELETE",
-          }
+        const response = await axios.delete(
+          `http://localhost:3000/deleteAdmin/${adminId}`
         );
-
-        if (!response.ok) {
+        if (response.status === 200) {
+          fetchData();
+        } else {
           throw new Error("Error deleting admin");
         }
-
-        // Refresh the list after deletion
-        fetchData();
       } catch (error) {
         console.error("Error during deletion:", error);
       }
@@ -186,165 +191,199 @@ function AccountSettingsPage() {
     cursor: "pointer",
   };
 
+  const spinnerStyle = {
+    border: "5px solid #f3f3f3",
+    borderTop: "5px solid #3498db",
+    borderRadius: "50%",
+    width: "40px",
+    height: "40px",
+    animation: "spin 2s linear infinite",
+    marginLeft: "800px", // 向右移动 300px
+  };
+
+  // 加载指示器容器样式
+  const spinnerContainerStyle = {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+  };
+
   return (
     <div className={classes.testmanagementpage}>
+      <style>
+        {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+      </style>
       <Header />
       <div className={classes.content}>
         <div className={classes.sidebarandmaincontent}>
           <Sidebar />
-          <div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                height: "60px",
-                marginBottom: "30px",
-              }}
-            >
-              <button
-                style={{
-                  width: "200px",
-                  marginLeft: "20px",
-                  marginTop: "20px",
-                }}
-                onClick={() => setModalIsOpen(true)}
-              >
-                Add New Administrator
-              </button>
+          {isLoading && (
+            <div style={spinnerContainerStyle}>
+              <div style={spinnerStyle}></div> {/* 加载指示器 */}
             </div>
-            <Modal
-              isOpen={modalIsOpen}
-              onRequestClose={() => setModalIsOpen(false)}
-              style={modalStyles}
-              contentLabel="Add New Administrator"
-            >
-              <span
-                className="close-button"
+          )}
+
+          {!isLoading && (
+            <div>
+              <div
                 style={{
-                  float: "right",
-                  fontSize: "1.5rem",
-                  fontWeight: "bold",
-                  cursor: "pointer",
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "60px",
+                  marginBottom: "30px",
                 }}
-                onClick={() => setModalIsOpen(false)}
               >
-                &times;
-              </span>
-              <form onSubmit={handleSubmit}>
-                {/* 表单元素 */}
-                <div style={{ marginBottom: "15px" }}>
-                  <label style={labelStyle}>
-                    Please upload your profile photo
-                  </label>
-                  <input
-                    type="file"
-                    name="adminPhoto"
-                    onChange={handleFileChange}
-                    required
-                    style={inputStyle}
-                  />
-                  <label style={labelStyle}>First Name</label>
-                  <input
-                    type="text"
-                    name="adminFirstName"
-                    onChange={handleInputChange}
-                    required
-                    style={inputStyle}
-                  />
-                  <label style={labelStyle}>Last Name</label>
-                  <input
-                    type="text"
-                    name="adminLastName"
-                    onChange={handleInputChange}
-                    required
-                    style={inputStyle}
-                  />
-                  <label style={labelStyle}>Email</label>
-                  <input
-                    type="email"
-                    name="adminEmail"
-                    onChange={handleInputChange}
-                    required
-                    style={inputStyle}
-                  />
-                  <label style={labelStyle}>Password</label>
-                  <input
-                    type="password"
-                    name="adminPassword"
-                    onChange={handleInputChange}
-                    required
-                    style={inputStyle}
-                  />
-                  <label style={labelStyle}>Confirm Password</label>
-                  <input
-                    type="password"
-                    name="confirmAdminPassword"
-                    onChange={handleInputChange}
-                    style={inputStyle}
-                    required
-                  />
-                  <label style={labelStyle}>Address</label>
-                  <input
-                    type="text"
-                    name="adminAddress"
-                    onChange={handleInputChange}
-                    style={inputStyle}
-                    required
-                  />
-                  <label style={labelStyle}>Phone Number</label>
-                  <input
-                    type="text"
-                    name="adminPhoneNumber"
-                    onChange={handleInputChange}
-                    style={inputStyle}
-                    required
-                  />
-                </div>
-                <button type="submit">Submit</button>
-              </form>
-            </Modal>
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th style={thStyle}>ID</th>
-                  <th style={thStyle}>First Name</th>
-                  <th style={thStyle}>Last Name</th>
-                  <th style={thStyle}>Email</th>
-                  <th style={thStyle}>Address</th>
-                  <th style={thStyle}>Phone Number</th>
-                  <th style={thStyle}>Delete</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items && items.length > 0 ? (
-                  items.map((item) => (
-                    <tr key={item.adminId}>
-                      <td style={tdStyle}>{item.adminId}</td>
-                      <td style={tdStyle}>{item.adminFirstName}</td>
-                      <td style={tdStyle}>{item.adminLastName}</td>
-                      <td style={tdStyle}>{item.adminEmail}</td>
-                      <td style={tdStyle}>{item.adminAddress}</td>
-                      <td style={tdStyle}>{item.adminPhoneNumber}</td>
-                      <td style={buttonColumnStyle}>
-                        <button
-                          style={buttonStyleDelete}
-                          onClick={() => handleDelete(item.adminId)}
-                        >
-                          Delete
-                        </button>
+                <button
+                  style={{
+                    width: "200px",
+                    marginLeft: "20px",
+                    marginTop: "20px",
+                  }}
+                  onClick={() => setModalIsOpen(true)}
+                >
+                  Add New Administrator
+                </button>
+              </div>
+              <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={() => setModalIsOpen(false)}
+                style={modalStyles}
+                contentLabel="Add New Administrator"
+              >
+                <span
+                  className="close-button"
+                  style={{
+                    float: "right",
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => setModalIsOpen(false)}
+                >
+                  &times;
+                </span>
+                <form onSubmit={handleSubmit}>
+                  {/* 表单元素 */}
+                  <div style={{ marginBottom: "15px" }}>
+                    <label style={labelStyle}>
+                      Please upload your profile photo
+                    </label>
+                    <input
+                      type="file"
+                      name="adminPhoto"
+                      onChange={handleFileChange}
+                      required
+                      style={inputStyle}
+                    />
+                    <label style={labelStyle}>First Name</label>
+                    <input
+                      type="text"
+                      name="adminFirstName"
+                      onChange={handleInputChange}
+                      required
+                      style={inputStyle}
+                    />
+                    <label style={labelStyle}>Last Name</label>
+                    <input
+                      type="text"
+                      name="adminLastName"
+                      onChange={handleInputChange}
+                      required
+                      style={inputStyle}
+                    />
+                    <label style={labelStyle}>Email</label>
+                    <input
+                      type="email"
+                      name="adminEmail"
+                      onChange={handleInputChange}
+                      required
+                      style={inputStyle}
+                    />
+                    <label style={labelStyle}>Password</label>
+                    <input
+                      type="password"
+                      name="adminPassword"
+                      onChange={handleInputChange}
+                      required
+                      style={inputStyle}
+                    />
+                    <label style={labelStyle}>Confirm Password</label>
+                    <input
+                      type="password"
+                      name="confirmAdminPassword"
+                      onChange={handleInputChange}
+                      style={inputStyle}
+                      required
+                    />
+                    <label style={labelStyle}>Address</label>
+                    <input
+                      type="text"
+                      name="adminAddress"
+                      onChange={handleInputChange}
+                      style={inputStyle}
+                      required
+                    />
+                    <label style={labelStyle}>Phone Number</label>
+                    <input
+                      type="text"
+                      name="adminPhoneNumber"
+                      onChange={handleInputChange}
+                      style={inputStyle}
+                      required
+                    />
+                  </div>
+                  <button type="submit">Submit</button>
+                </form>
+              </Modal>
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={thStyle}>ID</th>
+                    <th style={thStyle}>First Name</th>
+                    <th style={thStyle}>Last Name</th>
+                    <th style={thStyle}>Email</th>
+                    <th style={thStyle}>Address</th>
+                    <th style={thStyle}>Phone Number</th>
+                    <th style={thStyle}>Delete</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items && items.length > 0 ? (
+                    items.map((item) => (
+                      <tr key={item.adminId}>
+                        <td style={tdStyle}>{item.adminId}</td>
+                        <td style={tdStyle}>{item.adminFirstName}</td>
+                        <td style={tdStyle}>{item.adminLastName}</td>
+                        <td style={tdStyle}>{item.adminEmail}</td>
+                        <td style={tdStyle}>{item.adminAddress}</td>
+                        <td style={tdStyle}>{item.adminPhoneNumber}</td>
+                        <td style={buttonColumnStyle}>
+                          <button
+                            style={buttonStyleDelete}
+                            onClick={() => handleDelete(item.adminId)}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={7} style={tdStyle}>
+                        Loading data...
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={7} style={tdStyle}>
-                      Loading data...
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -366,7 +405,7 @@ const tableStyle: React.CSSProperties = {
 };
 
 const thStyle: React.CSSProperties = {
-  backgroundColor: "#f2f2f2",
+  backgroundColor: "#ADD8E6",
   textAlign: "left",
   padding: "10px",
 };
